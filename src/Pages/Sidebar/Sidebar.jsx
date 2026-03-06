@@ -37,7 +37,7 @@ function Sidebar() {
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 w-full h-[70px] border-t flex flex-row items-center justify-around z-[100] bg-white border-gray-100 md:relative md:flex-col md:w-[260px] md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all">
+            <div className="fixed bottom-0 left-0 w-full h-70px border-t flex flex-row items-center justify-around z-100 bg-white border-gray-100 md:relative md:flex-col md:w-[260px] md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all">
 
                 {/* User Profile Section */}
                 <div className="hidden md:flex items-center gap-3 mb-8 px-2 w-full">
@@ -87,7 +87,7 @@ function Sidebar() {
 
             {/* Logout Modal */}
             {isLogoutModalOpen && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[200] px-4">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-200 px-4">
                     <div className="p-6 rounded-2xl shadow-xl max-w-xs w-full bg-white text-[#163D5C] animate-in zoom-in duration-200">
                         <h3 className="text-lg font-bold mb-2">Chiqish</h3>
                         <p className="text-sm mb-6 text-gray-600">Tizimdan chiqishni xohlaysizmi?</p>
