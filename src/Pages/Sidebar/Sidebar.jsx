@@ -5,8 +5,7 @@ import {
     MdLogout,
     MdNotificationsNone,
     MdOutlinePersonOutline,
-    MdOutlineWork,
-    MdOutlineSettings
+    MdOutlineWork
 } from 'react-icons/md';
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { IoStatsChart } from "react-icons/io5";
@@ -17,7 +16,7 @@ function Sidebar() {
 
     // Statik ma'lumotlar (Backend o'rniga)
     const user = {
-        name: "Ibrohim",
+        name: "Admin",
         city: "Namangan"
     };
 
@@ -37,16 +36,13 @@ function Sidebar() {
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 w-full h-70px border-t flex flex-row items-center justify-around z-100 bg-white border-gray-100 md:relative md:flex-col md:w-65 md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all">
+            <div className="fixed bottom-0 left-0 w-full h-70px border-t flex flex-row items-center justify-around z-100 bg-white border-gray-100 md:flex-col md:w-65 md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all">
 
                 {/* User Profile Section */}
                 <div className="hidden md:flex items-center gap-3 mb-8 px-2 w-full">
-                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-100">
-                        <img src={user.img} alt="Profile" className="w-full h-full object-cover" />
-                    </div>
                     <div className="flex flex-col overflow-hidden">
-                        <h3 className="font-semibold text-[15px] truncate text-[#333]">{user.name}</h3>
-                        <p className="text-[12px] text-gray-400 truncate">{user.city}</p>
+                        <h3 className="font-semibold text-[20px] truncate text-[#333]">{user.name}</h3>
+                        <p className="text-[17px] text-gray-400 truncate">{user.city}</p>
                     </div>
                 </div>
 
