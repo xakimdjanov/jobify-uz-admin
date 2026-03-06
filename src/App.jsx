@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 
 import Sidebar from './Pages/Sidebar/Sidebar';
@@ -9,14 +9,13 @@ import Job from './Pages/Job/Job.jsx';
 import Message from './Pages/Message/Message.jsx';
 import Notification from './Pages/Notificatons/Notification.jsx';
 
-
 function App() {
   return (
     <div className="flex min-h-screen bg-[#F8F9FB]">
       <Sidebar />
-      <main className="flex-1 p-5 md:p-10">
+      <main className="flex-1 p-5 md:p-10 transition-all duration-300 md:ml-64 pb-20 md:pb-10">
         <Routes>
-          {/* <Route path="/"/> */}
+          <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/company" element={<Company />} />
           <Route path="/talent" element={<Talent />} />
@@ -25,8 +24,8 @@ function App() {
           <Route path="/notification" element={<Notification />} />
         </Routes>
       </main>
-    </div >
-  )
+    </div>
+  );
 };
 
 export default App;
