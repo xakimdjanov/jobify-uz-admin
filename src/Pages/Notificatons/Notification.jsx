@@ -13,11 +13,11 @@ function Notification() {
     const [users, setUsers] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
-    const [searchTerm, setSearchTerm] = useState(''); // Qidiruv uchun
+    const [searchTerm, setSearchTerm] = useState('');
     
     const [formData, setFormData] = useState({
-        targetGroup: 'talent', // talent yoki company
-        sendMode: 'all',       // all yoki single
+        targetGroup: 'talent', 
+        sendMode: 'all',       
         selectedId: '',    
         title: '',
         message: '',
@@ -38,12 +38,39 @@ function Notification() {
         } catch (error) { toast.error("Ma'lumotlarni yuklashda xatolik!"); }
     };
 
+    // O'chirish funksiyasi
+const handleDelete = async (id) => {
+    if (!window.confirm("Ushbu bildirishnomani o'chirmoqchimisiz?")) return;
+    
+    // Rasmda ko'rsatilganidek 'adminToken' kalitidan olamiz
+    const token = localStorage.getItem('adminToken');
+
+    if (!token) {
+        toast.error("Admin token topilmadi! Tizimga qayta kiring.");
+        return;
+    }
+
+    try {
+        // Tokenni API funksiyasiga ikkinchi argument sifatida uzatamiz
+        await notificationApi.delete(id, token);
+        
+        setNotifications(prev => prev.filter(n => (n.id !== id && n._id !== id)));
+        toast.info("Xabar muvaffaqiyatli o'chirildi");
+    } catch (error) {
+        console.error("Delete error:", error);
+        if (error.response?.status === 401) {
+            toast.error("Sessiya muddati tugagan yoki ruxsat yo'q!");
+        } else {
+            toast.error("O'chirishda xatolik yuz berdi");
+        }
+    }
+};
+
     useEffect(() => {
         fetchNotifications();
         loadUsers(formData.targetGroup);
     }, [formData.targetGroup]);
 
-    // Qidiruv natijasida filtrlangan foydalanuvchilar
     const filteredUsers = useMemo(() => {
         return users.filter(u => {
             const name = (u.fullName || u.companyName || u.email || "").toLowerCase();
@@ -64,7 +91,6 @@ function Notification() {
 
         try {
             if (formData.sendMode === 'all') {
-                // --- BARCHAGA BITTA-BITTA YUBORISH ---
                 const total = users.length;
                 if (total === 0) throw new Error("Yuborish uchun foydalanuvchilar topilmadi.");
 
@@ -85,7 +111,6 @@ function Notification() {
                 }
                 toast.update(toastId, { render: `Muvaffaqiyatli! ${total} ta manzilga yuborildi.`, type: "success", isLoading: false, autoClose: 3000 });
             } else {
-                // --- FAQAT BITTASIGA YUBORISH ---
                 const payload = {
                     title: formData.title,
                     message: formData.message,
@@ -120,57 +145,54 @@ function Notification() {
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* CHAP TOMON: FORM */}
+                    {/* FORM QISMI */}
                     <div className="lg:col-span-7 space-y-6">
                         <div className="bg-white p-6 rounded-[28px] shadow-sm border border-slate-200">
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* 1. Kimga: Talent yoki Company */}
                                 <div className="space-y-3">
                                     <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Kimga yuboramiz?</label>
                                     <div className="flex gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setFormData({...formData, targetGroup: 'talent'})}
-                                            className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 ${formData.targetGroup === 'talent' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
+                                            className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'talent' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
                                             <MdPerson size={20} /> Talentlar
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setFormData({...formData, targetGroup: 'company'})}
-                                            className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 ${formData.targetGroup === 'company' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
+                                            className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'company' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
                                             <MdBusiness size={20} /> Kompaniyalar
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* 2. Mode: All yoki Single */}
                                 <div className="flex bg-slate-100 p-1.5 rounded-2xl">
                                     <button
                                         type="button"
                                         onClick={() => setFormData({...formData, sendMode: 'all'})}
-                                        className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${formData.sendMode === 'all' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
+                                        className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'all' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
                                         <MdGroups size={18} /> Barchasiga
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setFormData({...formData, sendMode: 'single'})}
-                                        className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${formData.sendMode === 'single' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
+                                        className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'single' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
                                         <MdPerson size={18} /> Bittasiga
                                     </button>
                                 </div>
 
-                                {/* 3. Foydalanuvchini tanlash va Qidiruv */}
                                 {formData.sendMode === 'single' && (
                                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                                         <div className="relative">
                                             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                             <input 
                                                 type="text"
-                                                placeholder="Ism yoki email orqali qidirish..."
+                                                placeholder="Qidirish..."
                                                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -180,7 +202,7 @@ function Notification() {
                                             size="5"
                                             value={formData.selectedId}
                                             onChange={(e) => setFormData({ ...formData, selectedId: e.target.value })}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 outline-none focus:ring-2 focus:ring-blue-500/20 overflow-y-auto"
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 outline-none focus:ring-2 focus:ring-blue-500/20 overflow-y-auto cursor-pointer"
                                         >
                                             {filteredUsers.length > 0 ? filteredUsers.map(u => (
                                                 <option key={u.id || u._id} value={u.id || u._id} className="p-2 rounded-lg cursor-pointer hover:bg-slate-50">
@@ -202,7 +224,7 @@ function Notification() {
                                     />
                                     <textarea
                                         rows="4"
-                                        placeholder="Xabar matnini kiriting..."
+                                        placeholder="Xabar matni..."
                                         value={formData.message}
                                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:border-blue-500 transition-colors resize-none"
@@ -213,7 +235,7 @@ function Notification() {
                                 <button
                                     type="submit"
                                     disabled={sending}
-                                    className={`w-full py-4 rounded-2xl text-white font-black shadow-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98] ${formData.targetGroup === 'talent' ? 'bg-blue-600 shadow-blue-200 hover:bg-blue-700' : 'bg-orange-500 shadow-orange-200 hover:bg-orange-600'}`}
+                                    className={`w-full py-4 rounded-2xl text-white font-black shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer active:scale-[0.98] ${formData.targetGroup === 'talent' ? 'bg-blue-600 shadow-blue-200 hover:bg-blue-700' : 'bg-orange-500 shadow-orange-200 hover:bg-orange-600'}`}
                                 >
                                     {sending ? "Yuborilmoqda..." : "Yuborishni boshlash"} <MdSend />
                                 </button>
@@ -221,7 +243,7 @@ function Notification() {
                         </div>
                     </div>
 
-                    {/* O'NG TOMON: TARIX */}
+                    {/* TARIX QISMI */}
                     <div className="lg:col-span-5 space-y-4">
                         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 px-2">
                             <MdCheckCircle className="text-green-500" /> Oxirgi yuborilganlar
@@ -230,7 +252,7 @@ function Notification() {
                             {loading ? (
                                 <div className="bg-white p-10 rounded-[28px] text-center text-slate-400">Yuklanmoqda...</div>
                             ) : notifications.length === 0 ? (
-                                <div className="bg-white p-10 rounded-[28px] text-center text-slate-400 border border-dashed border-slate-300">Hozircha tarix bo'sh.</div>
+                                <div className="bg-white p-10 rounded-[28px] text-center text-slate-400 border border-dashed border-slate-300">Tarix bo'sh.</div>
                             ) : (
                                 notifications.map((note) => (
                                     <div key={note.id || note._id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group relative">
@@ -241,16 +263,18 @@ function Notification() {
                                             <div className="pr-6">
                                                 <h4 className="font-bold text-slate-800 text-sm leading-tight">{note.title}</h4>
                                                 <p className="text-xs text-slate-500 mt-1 line-clamp-2">{note.message}</p>
-                                                <span className="text-[9px] text-slate-400 mt-2 block font-bold uppercase tracking-tighter">
+                                                <span className="text-[9px] text-slate-400 mt-2 block font-bold">
                                                     {new Date(note.createdAt).toLocaleString()}
                                                 </span>
                                             </div>
                                         </div>
+                                        {/* O'chirish tugmasi - Kursor va effektlar qo'shildi */}
                                         <button 
                                             onClick={() => handleDelete(note.id || note._id)}
-                                            className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"
+                                            className="absolute top-4 right-4 text-slate-300 hover:text-red-500 hover:scale-120 transition-all cursor-pointer p-1"
+                                            title="O'chirish"
                                         >
-                                            <MdDeleteOutline size={20} />
+                                            <MdDeleteOutline size={22} />
                                         </button>
                                     </div>
                                 ))
