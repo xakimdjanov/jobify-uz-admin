@@ -59,6 +59,9 @@ const SkeletonLoader = () => (
   </div>
 );
 
+
+
+
 const JobDetailPageCompany = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -184,7 +187,7 @@ const JobDetailPageCompany = () => {
     try {
       await jobApi.delete(id);
       toast.success("E'lon muvaffaqiyatli o'chirildi");
-      navigate("/company/my-jobs");
+      navigate("/jobs");
     } catch (error) {
       toast.error("O'chirishda xatolik yuz berdi");
     } finally {
@@ -318,7 +321,6 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
-
         {/* --- INVITE MODAL --- */}
         {isInviteModalOpen && (
           <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -388,7 +390,6 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
-
         {/* --- EDIT MODAL --- */}
         {isEditModalOpen && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -467,7 +468,6 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
-
         {/* --- HEADER --- */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 mt-2 md:mt-0 w-full">
           <div className="px-6 sm:px-8 py-4 rounded-2xl shadow-sm border flex-1 w-full text-center md:text-left bg-white border-gray-100">
@@ -482,7 +482,6 @@ const JobDetailPageCompany = () => {
             Post a Job
           </button>
         </div>
-
         {/* --- JOB HEADER CARD --- */}
         <div className="rounded-[2.5rem] p-6 sm:p-10 shadow-sm border mb-10 relative transition-colors bg-white border-gray-100">
           <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-8 mb-8 lg:pr-12">
@@ -562,19 +561,17 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         </div>
-
         {/* --- BACK BUTTON --- */}
         <button
-          onClick={() => navigate("/company/my-jobs")}
+          onClick={() => navigate("/jobs")}
           className="group flex items-center justify-center gap-3 font-bold mb-10 w-full sm:w-[240px] h-[60px] border-2 rounded-2xl shadow-sm transition-all duration-300 border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white"
         >
           <MdKeyboardArrowLeft
             size={28}
             className="transition-transform duration-300 group-hover:-translate-x-2"
           />
-          <span className="text-[18px]">Back to My jobs</span>
+          <span className="text-[18px]">Back to Jobs</span>
         </button>
-
         {/* --- TABS --- */}
         <div className="flex p-1.5 rounded-[1.5rem] w-full relative mb-10 overflow-hidden bg-[#E9E9E9]">
           <div
@@ -593,7 +590,6 @@ const JobDetailPageCompany = () => {
             Invitations sent
           </button>
         </div>
-
         {/* --- CARDLAR RO'YXATI --- */}
         <div className="pb-20">
           <div className="mb-6 flex items-baseline justify-center md:justify-start gap-2">
