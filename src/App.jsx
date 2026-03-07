@@ -4,6 +4,7 @@ import "./App.css";
 import Sidebar from "./Pages/Sidebar/Sidebar";
 import Dashboard from "./Pages/Dashboard/Dashboard.jsx";
 import Company from "./Pages/Company/Company.jsx";
+import CompanyDetail from "./Pages/Company/CompanyDetail.jsx";
 import Talent from "./Pages/Talent/Talent.jsx";
 import Jobs from "./Pages/Job/Job.jsx";
 import Message from "./Pages/Message/Message.jsx";
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/company" element={<Company />} />
+          <Route path="/company/:id" element={<CompanyDetail />} />
           <Route path="/message" element={<Message />} />
           <Route path="/notification" element={<Notification />} />
           <Route path="/talent" element={<Talent />} />
