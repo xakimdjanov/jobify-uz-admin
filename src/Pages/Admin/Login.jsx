@@ -25,7 +25,7 @@ const Login = () => {
     try {
       const response = await adminApi.login(credentials);
       const token = response.data.token;
-      localStorage.setItem("adminToken", token);
+      localStorage.setItem("token", token);
       navigate("/dashboard");
     } catch (error) {
       alert("Email yoki parol xato!");
