@@ -76,7 +76,7 @@ function Sidebar() {
                     {/* Logout Button */}
                     <button
                         onClick={() => setIsLogoutModalOpen(true)}
-                        className="hidden md:flex items-center gap-3 px-4 py-3 rounded-md transition-all mt-auto w-full text-red-500 hover:text-red-500 hover:bg-red-50"
+                        className="cursor-pointer hidden md:flex items-center gap-3 px-4 py-3 rounded-md transition-all mt-auto w-full text-red-500 hover:text-red-500 hover:bg-red-50"
                     >
                         <MdLogout size={20} className="shrink-0" />
                         <span className="text-[14px] font-medium">Logout</span>
@@ -91,8 +91,8 @@ function Sidebar() {
                         <h3 className="text-lg font-bold mb-2">Chiqish</h3>
                         <p className="text-sm mb-6 text-gray-600">Tizimdan chiqishni xohlaysizmi?</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 py-2 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50">Yo'q</button>
-                            <button onClick={handleLogout} className="flex-1 py-2 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600">Ha</button>
+                            <button onClick={() => setIsLogoutModalOpen(false)} className="cursor-pointer flex-1 py-2 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50">Yo'q</button>
+                            <button onClick={handleLogout} className="cursor-pointer flex-1 py-2 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600">Ha</button>
                         </div>
                     </div>
                 </div>

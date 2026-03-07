@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { talentApi, companyApi, notificationApi } from "../../services/api";
-import { 
-    MdSend, MdDeleteOutline, MdNotificationsNone, 
-    MdOutlineMessage, MdPerson, MdBusiness, 
-    MdGroups, MdSearch, MdCheckCircle 
+import {
+    MdSend, MdDeleteOutline, MdNotificationsNone,
+    MdOutlineMessage, MdPerson, MdBusiness,
+    MdGroups, MdSearch, MdCheckCircle
 } from 'react-icons/md';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Notification() {
     const [notifications, setNotifications] = useState([]);
-    const [users, setUsers] = useState([]); 
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    
+
     const [formData, setFormData] = useState({
-        targetGroup: 'talent', 
-        sendMode: 'all',       
-        selectedId: '',    
+        targetGroup: 'talent',
+        sendMode: 'all',
+        selectedId: '',
         title: '',
         message: '',
     });
@@ -39,31 +39,31 @@ function Notification() {
     };
 
     // O'chirish funksiyasi
-const handleDelete = async (id) => {
-    if (!window.confirm("Ushbu bildirishnomani o'chirmoqchimisiz?")) return;
-    
-    // Rasmda ko'rsatilganidek 'adminToken' kalitidan olamiz
-    const token = localStorage.getItem('adminToken');
+    const handleDelete = async (id) => {
+        if (!window.confirm("Ushbu bildirishnomani o'chirmoqchimisiz?")) return;
 
-    if (!token) {
-        toast.error("Admin token topilmadi! Tizimga qayta kiring.");
-        return;
-    }
+        // Rasmda ko'rsatilganidek 'adminToken' kalitidan olamiz
+        const token = localStorage.getItem('adminToken');
 
-    try {
-        await notificationApi.delete(id, token);
-        
-        setNotifications(prev => prev.filter(n => (n.id !== id && n._id !== id)));
-        toast.info("Xabar muvaffaqiyatli o'chirildi");
-    } catch (error) {
-        console.error("Delete error:", error);
-        if (error.response?.status === 401) {
-            toast.error("Sessiya muddati tugagan yoki ruxsat yo'q!");
-        } else {
-            toast.error("O'chirishda xatolik yuz berdi");
+        if (!token) {
+            toast.error("Admin token topilmadi! Tizimga qayta kiring.");
+            return;
         }
-    }
-};
+
+        try {
+            await notificationApi.delete(id, token);
+
+            setNotifications(prev => prev.filter(n => (n.id !== id && n._id !== id)));
+            toast.info("Xabar muvaffaqiyatli o'chirildi");
+        } catch (error) {
+            console.error("Delete error:", error);
+            if (error.response?.status === 401) {
+                toast.error("Sessiya muddati tugagan yoki ruxsat yo'q!");
+            } else {
+                toast.error("O'chirishda xatolik yuz berdi");
+            }
+        }
+    };
 
     useEffect(() => {
         fetchNotifications();
@@ -95,10 +95,10 @@ const handleDelete = async (id) => {
 
                 for (let i = 0; i < total; i++) {
                     const user = users[i];
-                    toast.update(toastId, { 
+                    toast.update(toastId, {
                         render: `Yuborilmoqda: ${i + 1} / ${total}`,
                         type: "default",
-                        isLoading: true 
+                        isLoading: true
                     });
 
                     await notificationApi.send({
@@ -132,7 +132,7 @@ const handleDelete = async (id) => {
     return (
         <div className="min-h-screen p-4 lg:p-10 bg-[#f4f7fe] text-slate-800">
             <ToastContainer position="top-right" theme="colored" />
-            
+
             <div className="max-w-4xl mx-auto">
                 <header className="mb-8 flex justify-between items-center">
                     <div>
@@ -153,14 +153,14 @@ const handleDelete = async (id) => {
                                     <div className="flex gap-3">
                                         <button
                                             type="button"
-                                            onClick={() => setFormData({...formData, targetGroup: 'talent'})}
+                                            onClick={() => setFormData({ ...formData, targetGroup: 'talent' })}
                                             className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'talent' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
                                             <MdPerson size={20} /> Talentlar
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setFormData({...formData, targetGroup: 'company'})}
+                                            onClick={() => setFormData({ ...formData, targetGroup: 'company' })}
                                             className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'company' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
                                             <MdBusiness size={20} /> Kompaniyalar
@@ -171,14 +171,14 @@ const handleDelete = async (id) => {
                                 <div className="flex bg-slate-100 p-1.5 rounded-2xl">
                                     <button
                                         type="button"
-                                        onClick={() => setFormData({...formData, sendMode: 'all'})}
+                                        onClick={() => setFormData({ ...formData, sendMode: 'all' })}
                                         className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'all' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
                                         <MdGroups size={18} /> Barchasiga
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setFormData({...formData, sendMode: 'single'})}
+                                        onClick={() => setFormData({ ...formData, sendMode: 'single' })}
                                         className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'single' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
                                         <MdPerson size={18} /> Bittasiga
@@ -189,7 +189,7 @@ const handleDelete = async (id) => {
                                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                                         <div className="relative">
                                             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                            <input 
+                                            <input
                                                 type="text"
                                                 placeholder="Qidirish..."
                                                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
@@ -247,7 +247,7 @@ const handleDelete = async (id) => {
                         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 px-2">
                             <MdCheckCircle className="text-green-500" /> Oxirgi yuborilganlar
                         </h3>
-                        <div className="space-y-3 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-3 max-h-175 overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
                                 <div className="bg-white p-10 rounded-[28px] text-center text-slate-400">Yuklanmoqda...</div>
                             ) : notifications.length === 0 ? (
@@ -268,7 +268,7 @@ const handleDelete = async (id) => {
                                             </div>
                                         </div>
                                         {/* O'chirish tugmasi - Kursor va effektlar qo'shildi */}
-                                        <button 
+                                        <button
                                             onClick={() => handleDelete(note.id || note._id)}
                                             className="absolute top-4 right-4 text-slate-300 hover:text-red-500 hover:scale-120 transition-all cursor-pointer p-1"
                                             title="O'chirish"
