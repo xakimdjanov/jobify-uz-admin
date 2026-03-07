@@ -14,7 +14,7 @@ function Sidebar() {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-    // Statik ma'lumotlar (Backend o'rniga)
+    // Statik ma'lumotlar
     const user = {
         name: "Admin",
         city: "Namangan"
@@ -29,10 +29,18 @@ function Sidebar() {
         { name: 'Notification', path: '/notification', icon: <MdNotificationsNone size={22} />, mobile: true }
     ];
 
+    // --- LOGOUT MANTIQI SHU YERDA ---
     const handleLogout = () => {
-        // Chiqish mantiqi (Masalan login sahifasiga yuborish)
-        navigate('/login');
+        // Tizimdan chiqishda barcha local ma'lumotlarni tozalaymiz
+        localStorage.clear();
+
+        // Modalni yopamiz
+        setIsLogoutModalOpen(false);
+
+        // Foydalanuvchini login sahifasiga haydaymiz
+        navigate('/login', { replace: true });
     };
+    // --------------------------------
 
     return (
         <>
@@ -62,18 +70,13 @@ function Sidebar() {
                         >
                             <span className="shrink-0">{item.icon}</span>
                             <span className="text-[10px] md:text-[14px] font-medium">{item.name}</span>
-
-                            {item.badge && (
-                                <span className="absolute top-1 right-2 md:right-4 bg-[#2ECC71] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                                    {item.badge}
-                                </span>
-                            )}
                         </NavLink>
                     ))}
 
+                    {/* Logout Button */}
                     <button
                         onClick={() => setIsLogoutModalOpen(true)}
-                        className="hidden md:flex items-center gap-3 px-4 py-3 rounded-md transition-all mt-auto w-full text-[#9BA6B1] hover:text-red-500 hover:bg-red-50"
+                        className="hidden md:flex items-center gap-3 px-4 py-3 rounded-md transition-all mt-auto w-full text-red-500 hover:text-red-500 hover:bg-red-50"
                     >
                         <MdLogout size={20} className="shrink-0" />
                         <span className="text-[14px] font-medium">Logout</span>
