@@ -204,10 +204,19 @@ export const confirmResetPassword = async (email, code, newPassword) => {
 
 // --- NOTIFICATION API ---
 export const notificationApi = {
-  send: (data) => api.post("/notifications", data),
+  // Data va tokenni qabul qiladi
+  send: (data, token) => api.post("/notifications", data, {
+    headers: { Authorization: `Bearer ${token}` }
+  }),
+  
   getAll: () => api.get("/notifications"),
+  
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
-  delete: (id) => api.delete(`/notifications/${id}`), //notification
+  
+  // ID va tokenni qabul qiladi
+  delete: (id, token) => api.delete(`/notifications/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  }),
 };
 
 export default api;
