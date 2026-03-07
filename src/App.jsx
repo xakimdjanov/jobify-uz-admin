@@ -35,7 +35,7 @@ function App() {
           <Route
             path="/*"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <Routes>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="company" element={<Company />} />
@@ -50,7 +50,7 @@ function App() {
                     element={<Navigate to="/dashboard" replace />}
                   />
                 </Routes>
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
         </Routes>
