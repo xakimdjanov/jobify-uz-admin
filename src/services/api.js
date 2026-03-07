@@ -201,4 +201,3 @@ export const notificationApi = {
 };
 
 export default api;
-export default api;

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
 
 import Sidebar from "./Pages/Sidebar/Sidebar";
@@ -10,17 +10,6 @@ import Message from "./Pages/Message/Message.jsx";
 import Notification from "./Pages/Notificatons/Notification.jsx";
 import TalentDetail from "./Pages/Talent/TalentDetail.jsx";
 import JobDetailPageCompany from "./Pages/Job/JobDetailPage.jsx";
-
-import { Route, Routes, Navigate } from 'react-router-dom';
-import './App.css';
-
-import Sidebar from './Pages/Sidebar/Sidebar';
-import Dashboard from './Pages/Dashboard/Dashboard.jsx';
-import Company from './Pages/Company/Company.jsx';
-import Talent from './Pages/Talent/Talent.jsx';
-import Job from './Pages/Job/Job.jsx';
-import Message from './Pages/Message/Message.jsx';
-import Notification from './Pages/Notificatons/Notification.jsx';
 
 function App() {
   return (
@@ -42,6 +31,5 @@ function App() {
     </div>
   );
 }
-};
 
 export default App;
