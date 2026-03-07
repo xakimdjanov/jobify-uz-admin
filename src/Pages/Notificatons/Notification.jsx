@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { talentApi, companyApi, notificationApi } from "../../services/api";
-import {
-    MdSend, MdDeleteOutline, MdNotificationsNone,
-    MdOutlineMessage, MdPerson, MdBusiness,
-    MdGroups, MdSearch, MdCheckCircle
+import { 
+    MdSend, MdDeleteOutline, MdNotificationsNone, 
+    MdOutlineMessage, MdPerson, MdBusiness, 
+    MdGroups, MdSearch, MdCheckCircle 
 } from 'react-icons/md';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Notification() {
     const [notifications, setNotifications] = useState([]);
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,49 +23,19 @@ function Notification() {
         message: '',
     });
 
-    // --- BILDIRISHNOMALARNI YUKLASH ---
     const fetchNotifications = async () => {
         try {
-            setLoading(true);
             const res = await notificationApi.getAll();
-            const data = res.data?.data || res.data || []; // API strukturasiga qarab
-            setNotifications([...data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-        } catch (error) {
-            console.error("Yuklashda xato:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // --- O'CHIRISH FUNKSIYASI (401 xatosini oldini olish bilan) ---
-    const handleDelete = async (id) => {
-        if (!window.confirm("Ushbu bildirishnomani o'chirishni xohlaysizmi?")) return;
-
-        try {
-            // notificationApi.delete ichida token borligini tekshiring
-            await notificationApi.delete(id);
-            toast.success("Bildirishnoma muvaffaqiyatli o'chirildi");
-
-            // UI'ni darhol yangilash (Serverga qayta so'rov yubormaslik uchun filter qilsa ham bo'ladi)
-            setNotifications(prev => prev.filter(n => (n.id || n._id) !== id));
-        } catch (error) {
-            console.error("O'chirishda xato:", error);
-            if (error.response?.status === 401) {
-                toast.error("Ruxsat yo'q (401)! Qayta tizimga kiring.");
-            } else {
-                toast.error("O'chirishda xatolik yuz berdi!");
-            }
-        }
+            setNotifications((res.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+        } catch (error) { console.error(error); } finally { setLoading(false); }
     };
 
     const loadUsers = async (group) => {
         setUsers([]);
         try {
             const res = group === 'talent' ? await talentApi.getAll() : await companyApi.getAll();
-            setUsers(res.data?.data || res.data || []);
-        } catch (error) {
-            toast.error("Foydalanuvchilarni yuklashda xatolik!");
-        }
+            setUsers(res.data || []);
+        } catch (error) { toast.error("Ma'lumotlarni yuklashda xatolik!"); }
     };
 
     // O'chirish funksiyasi
@@ -98,9 +68,6 @@ const handleDelete = async (id) => {
 
     useEffect(() => {
         fetchNotifications();
-    }, []);
-
-    useEffect(() => {
         loadUsers(formData.targetGroup);
     }, [formData.targetGroup]);
 
@@ -129,7 +96,11 @@ const handleDelete = async (id) => {
 
                 for (let i = 0; i < total; i++) {
                     const user = users[i];
-                    toast.update(toastId, { render: `Yuborilmoqda: ${i + 1} / ${total}`, isLoading: true });
+                    toast.update(toastId, { 
+                        render: `Yuborilmoqda: ${i + 1} / ${total}`,
+                        type: "default",
+                        isLoading: true 
+                    });
 
                     await notificationApi.send({
                         [formData.targetGroup === 'talent' ? 'talent_id' : 'company_id']: user.id || user._id,
@@ -138,13 +109,14 @@ const handleDelete = async (id) => {
                         type: "broadcast"
                     });
                 }
-                toast.update(toastId, { render: `Muvaffaqiyatli yuborildi!`, type: "success", isLoading: false, autoClose: 3000 });
+                toast.update(toastId, { render: `Muvaffaqiyatli! ${total} ta manzilga yuborildi.`, type: "success", isLoading: false, autoClose: 3000 });
             } else {
                 const payload = {
                     title: formData.title,
                     message: formData.message,
                     [formData.targetGroup === 'talent' ? 'talent_id' : 'company_id']: parseInt(formData.selectedId)
-                });
+                };
+                await notificationApi.send(payload);
                 toast.update(toastId, { render: "Xabar yuborildi!", type: "success", isLoading: false, autoClose: 3000 });
             }
 
@@ -152,7 +124,7 @@ const handleDelete = async (id) => {
             setSearchTerm('');
             fetchNotifications();
         } catch (error) {
-            toast.update(toastId, { render: "Xatolik yuz berdi!", type: "error", isLoading: false, autoClose: 3000 });
+            toast.update(toastId, { render: error.message || "Xatolik yuz berdi!", type: "error", isLoading: false, autoClose: 3000 });
         } finally {
             setSending(false);
         }
@@ -161,13 +133,15 @@ const handleDelete = async (id) => {
     return (
         <div className="min-h-screen p-4 lg:p-10 bg-[#f4f7fe] text-slate-800">
             <ToastContainer position="top-right" theme="colored" />
-
-            <div className="max-w-6xl mx-auto">
-                <header className="mb-8">
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
-                        <MdNotificationsNone className="text-blue-600" /> Bildirishnomalar
-                    </h1>
-                    <p className="text-slate-500 font-medium ml-9">Tizim bildirishnomalarini boshqarish</p>
+            
+            <div className="max-w-4xl mx-auto">
+                <header className="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+                            <MdNotificationsNone className="text-blue-600" /> Bildirishnomalar
+                        </h1>
+                        <p className="text-slate-500 font-medium">Boshqaruv paneli v2.0</p>
+                    </div>
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -176,21 +150,21 @@ const handleDelete = async (id) => {
                         <div className="bg-white p-6 rounded-[28px] shadow-sm border border-slate-200">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-3">
-                                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Target Group</label>
+                                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Kimga yuboramiz?</label>
                                     <div className="flex gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setFormData({...formData, targetGroup: 'talent'})}
                                             className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'talent' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
-                                            <MdPerson size={20} /> Talent
+                                            <MdPerson size={20} /> Talentlar
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setFormData({...formData, targetGroup: 'company'})}
                                             className={`flex-1 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all border-2 cursor-pointer ${formData.targetGroup === 'company' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-slate-100 bg-slate-50 text-slate-400'}`}
                                         >
-                                            <MdBusiness size={20} /> Company
+                                            <MdBusiness size={20} /> Kompaniyalar
                                         </button>
                                     </div>
                                 </div>
@@ -201,14 +175,14 @@ const handleDelete = async (id) => {
                                         onClick={() => setFormData({...formData, sendMode: 'all'})}
                                         className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'all' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
-                                        <MdGroups size={18} /> Broadcast
+                                        <MdGroups size={18} /> Barchasiga
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setFormData({...formData, sendMode: 'single'})}
                                         className={`flex-1 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${formData.sendMode === 'single' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500'}`}
                                     >
-                                        <MdPerson size={18} /> Single User
+                                        <MdPerson size={18} /> Bittasiga
                                     </button>
                                 </div>
 
@@ -216,7 +190,7 @@ const handleDelete = async (id) => {
                                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                                         <div className="relative">
                                             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                            <input
+                                            <input 
                                                 type="text"
                                                 placeholder="Qidirish..."
                                                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
@@ -234,7 +208,7 @@ const handleDelete = async (id) => {
                                                 <option key={u.id || u._id} value={u.id || u._id} className="p-2 rounded-lg cursor-pointer hover:bg-slate-50">
                                                     {u.fullName || u.companyName || u.email}
                                                 </option>
-                                            )) : <option disabled>No users found...</option>}
+                                            )) : <option disabled>Topilmadi...</option>}
                                         </select>
                                     </div>
                                 )}
@@ -242,7 +216,7 @@ const handleDelete = async (id) => {
                                 <div className="space-y-4">
                                     <input
                                         type="text"
-                                        placeholder="Title"
+                                        placeholder="Xabar sarlavhasi"
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:border-blue-500 transition-colors"
@@ -263,7 +237,7 @@ const handleDelete = async (id) => {
                                     disabled={sending}
                                     className={`w-full py-4 rounded-2xl text-white font-black shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer active:scale-[0.98] ${formData.targetGroup === 'talent' ? 'bg-blue-600 shadow-blue-200 hover:bg-blue-700' : 'bg-orange-500 shadow-orange-200 hover:bg-orange-600'}`}
                                 >
-                                    {sending ? "Sending..." : "Send Notification"} <MdSend />
+                                    {sending ? "Yuborilmoqda..." : "Yuborishni boshlash"} <MdSend />
                                 </button>
                             </form>
                         </div>
@@ -272,11 +246,11 @@ const handleDelete = async (id) => {
                     {/* TARIX QISMI */}
                     <div className="lg:col-span-5 space-y-4">
                         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 px-2">
-                            <MdCheckCircle className="text-green-500" /> Recent History
+                            <MdCheckCircle className="text-green-500" /> Oxirgi yuborilganlar
                         </h3>
-                        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-3 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
-                                <div className="bg-white p-10 rounded-[28px] text-center text-slate-400">Loading...</div>
+                                <div className="bg-white p-10 rounded-[28px] text-center text-slate-400">Yuklanmoqda...</div>
                             ) : notifications.length === 0 ? (
                                 <div className="bg-white p-10 rounded-[28px] text-center text-slate-400 border border-dashed border-slate-300">Tarix bo'sh.</div>
                             ) : (
@@ -286,7 +260,7 @@ const handleDelete = async (id) => {
                                             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${note.talent_id ? 'bg-blue-50 text-blue-500' : 'bg-orange-50 text-orange-500'}`}>
                                                 <MdOutlineMessage size={20} />
                                             </div>
-                                            <div className="pr-8">
+                                            <div className="pr-6">
                                                 <h4 className="font-bold text-slate-800 text-sm leading-tight">{note.title}</h4>
                                                 <p className="text-xs text-slate-500 mt-1 line-clamp-2">{note.message}</p>
                                                 <span className="text-[9px] text-slate-400 mt-2 block font-bold">
