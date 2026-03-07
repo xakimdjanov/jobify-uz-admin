@@ -19,16 +19,43 @@ const Login = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     const response = await adminApi.login(credentials);
+  //     const token = response.data.token;
+  //     localStorage.setItem("token", token);
+  //     navigate("/dashboard");
+  //   } catch (error) {
+  //     alert("Email yoki parol xato!");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log("Yuborilayotgan ma'lumotlar:", credentials); // 1. Tekshirish
+
     try {
       const response = await adminApi.login(credentials);
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      navigate("/dashboard");
+      console.log("Serverdan kelgan javob:", response); // 2. Tekshirish
+
+      // Agar token response.data ichida bo'lsa
+      const token =
+        response.data?.token || response.data?.access_token || response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        navigate("/dashboard");
+      } else {
+        alert("Token topilmadi. Server javobini tekshiring.");
+      }
     } catch (error) {
-      alert("Email yoki parol xato!");
+      console.error("Xatolik tafsiloti:", error.response); // 3. Xato sababi
+      alert(error.response?.data?.message || "Email yoki parol xato!");
     } finally {
       setLoading(false);
     }
