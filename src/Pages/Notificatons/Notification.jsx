@@ -51,7 +51,6 @@ const handleDelete = async (id) => {
     }
 
     try {
-        // Tokenni API funksiyasiga ikkinchi argument sifatida uzatamiz
         await notificationApi.delete(id, token);
         
         setNotifications(prev => prev.filter(n => (n.id !== id && n._id !== id)));
