@@ -1,14 +1,15 @@
-import { Route, Routes } from 'react-router-dom';
-import './App.css';
+import { Route, Routes } from "react-router-dom";
+import "./App.css";
 
-import Sidebar from './Pages/Sidebar/Sidebar';
-import Dashboard from './Pages/Dashboard/Dashboard.jsx';
-import Company from './Pages/Company/Company.jsx';
-import Talent from './Pages/Talent/Talent.jsx';
-import Job from './Pages/Job/Job.jsx';
-import Message from './Pages/Message/Message.jsx';
-import Notification from './Pages/Notificatons/Notification.jsx';
-
+import Sidebar from "./Pages/Sidebar/Sidebar";
+import Dashboard from "./Pages/Dashboard/Dashboard.jsx";
+import Company from "./Pages/Company/Company.jsx";
+import Talent from "./Pages/Talent/Talent.jsx";
+import Jobs from "./Pages/Job/Job.jsx";
+import Message from "./Pages/Message/Message.jsx";
+import Notification from "./Pages/Notificatons/Notification.jsx";
+import TalentDetail from "./Pages/Talent/TalentDetail.jsx";
+import JobDetailPageCompany from "./Pages/Job/JobDetailPage.jsx";
 
 function App() {
   return (
@@ -19,14 +20,16 @@ function App() {
           {/* <Route path="/"/> */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/company" element={<Company />} />
-          <Route path="/talent" element={<Talent />} />
-          <Route path="/jobs" element={<Job />} />
           <Route path="/message" element={<Message />} />
           <Route path="/notification" element={<Notification />} />
+          <Route path="/talent" element={<Talent />} />
+          <Route path="/talent/:id" element={<TalentDetail />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/talent/jobs/:id" element={<JobDetailPageCompany />} />
         </Routes>
       </main>
-    </div >
-  )
-};
+    </div>
+  );
+}
 
 export default App;
