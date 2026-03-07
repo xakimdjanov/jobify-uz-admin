@@ -198,12 +198,7 @@ function Job() {
                         >
                           <HiOutlineEye size={20} />
                         </Link>
-                        <button
-                          className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all cursor-pointer"
-                          title="Tahrirlash"
-                        >
-                          <HiOutlinePencilAlt size={20} />
-                        </button>
+
                         <button
                           onClick={() => openDeleteModal(job.id)}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
