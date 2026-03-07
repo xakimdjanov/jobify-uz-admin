@@ -59,9 +59,6 @@ const SkeletonLoader = () => (
   </div>
 );
 
-
-
-
 const JobDetailPageCompany = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -469,19 +466,27 @@ const JobDetailPageCompany = () => {
           </div>
         )}
         {/* --- HEADER --- */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 mt-2 md:mt-0 w-full">
-          <div className="px-6 sm:px-8 py-4 rounded-2xl shadow-sm border flex-1 w-full text-center md:text-left bg-white border-gray-100">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#4B5563]">
+        <div className="w-full mb-6 mt-2 md:mt-0">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 sm:p-6 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.06)]">
+            {/* Sarlavha - Hajmi kichraytirildi (text-xl sm:text-2xl) */}
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-700 tracking-tight">
               Job Details
             </h1>
+
+            {/* --- BACK BUTTON --- */}
+            <button
+              onClick={() => navigate("/jobs")}
+              className="group flex items-center justify-center gap-2 font-bold w-full sm:w-auto px-6 py-2.5 border-2 rounded-xl transition-all duration-300 border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white active:scale-[0.97] hover:shadow-md hover:shadow-[#1d3d5420]"
+            >
+              <MdKeyboardArrowLeft
+                size={22}
+                className="transition-transform duration-300 group-hover:-translate-x-1"
+              />
+              <span className="text-[16px]">Back to Jobs</span>
+            </button>
           </div>
-          <button
-            onClick={() => navigate("/company/post-job")}
-            className="bg-[#5CB85C] hover:bg-[#4cae4c] text-white w-full md:w-auto px-10 py-4 rounded-2xl font-bold transition-all"
-          >
-            Post a Job
-          </button>
         </div>
+
         {/* --- JOB HEADER CARD --- */}
         <div className="rounded-[2.5rem] p-6 sm:p-10 shadow-sm border mb-10 relative transition-colors bg-white border-gray-100">
           <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-8 mb-8 lg:pr-12">
@@ -561,48 +566,9 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         </div>
-        {/* --- BACK BUTTON --- */}
-        <button
-          onClick={() => navigate("/jobs")}
-          className="group flex items-center justify-center gap-3 font-bold mb-10 w-full sm:w-[240px] h-[60px] border-2 rounded-2xl shadow-sm transition-all duration-300 border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white"
-        >
-          <MdKeyboardArrowLeft
-            size={28}
-            className="transition-transform duration-300 group-hover:-translate-x-2"
-          />
-          <span className="text-[18px]">Back to Jobs</span>
-        </button>
-        {/* --- TABS --- */}
-        <div className="flex p-1.5 rounded-[1.5rem] w-full relative mb-10 overflow-hidden bg-[#E9E9E9]">
-          <div
-            className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-[1.2rem] shadow-sm transition-all duration-300 ${activeDetailTab === "Matches" ? "left-1.5" : "left-[calc(50%+3px)]"} bg-white`}
-          />
-          <button
-            onClick={() => setActiveDetailTab("Matches")}
-            className={`flex-1 py-3.5 z-10 font-bold text-xs sm:text-sm transition-colors ${activeDetailTab === "Matches" ? "text-[#343C44]" : "text-[#8E8E8E]"}`}
-          >
-            All Matches
-          </button>
-          <button
-            onClick={() => setActiveDetailTab("Invitations")}
-            className={`flex-1 py-3.5 z-10 font-bold text-xs sm:text-sm transition-colors ${activeDetailTab === "Invitations" ? "text-[#343C44]" : "text-[#8E8E8E]"}`}
-          >
-            Invitations sent
-          </button>
-        </div>
+
         {/* --- CARDLAR RO'YXATI --- */}
         <div className="pb-20">
-          <div className="mb-6 flex items-baseline justify-center md:justify-start gap-2">
-            <span className="text-xl sm:text-2xl font-bold text-[#343C44]">
-              {activeDetailTab === "Matches"
-                ? matchedTalents.length
-                : applications.length}
-            </span>
-            <span className="text-xl sm:text-2xl font-bold text-[#343C44]">
-              candidates
-            </span>
-          </div>
-
           <div className="grid grid-cols-1 min-[1350px]:grid-cols-2 gap-6 sm:gap-8 w-full">
             {(activeDetailTab === "Matches"
               ? matchedTalents
@@ -750,18 +716,6 @@ const JobDetailPageCompany = () => {
                 )
               );
             })}
-
-            {/* --- BO'SH HOLAT --- */}
-            {activeDetailTab === "Invitations" && applications.length === 0 && (
-              <div className="col-span-full text-center py-20 rounded-[2rem] border border-dashed bg-white border-gray-200 text-gray-400">
-                Hech qanday taklif yuborilmagan.
-              </div>
-            )}
-            {activeDetailTab === "Matches" && matchedTalents.length === 0 && (
-              <div className="col-span-full text-center py-20 rounded-[2rem] border border-dashed bg-white border-gray-200 text-gray-400">
-                Mos nomzodlar topilmadi.
-              </div>
-            )}
           </div>
         </div>
       </div>
