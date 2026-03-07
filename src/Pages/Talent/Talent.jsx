@@ -1,287 +1,225 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { talentApi } from "../../services/api";
-import { HiOutlineLocationMarker } from "react-icons/hi";
+import {
+  HiOutlineEye,
+  HiOutlineTrash,
+  HiOutlineUserCircle,
+  HiExclamation,
+  HiOutlineGlobeAlt,
+} from "react-icons/hi";
 import toast from "react-hot-toast";
+
+// Server bazaviy manzili
+const BASE_URL = "https://jobify-backend-production-6a97.up.railway.app";
+// Detail sahifangizdagi default avatar
+const DEFAULT_AVATAR =
+  "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=";
 
 function Talents() {
   const [talents, setTalents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [expandedAbout, setExpandedAbout] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTalentId, setSelectedTalentId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const navigate = useNavigate();
 
-  // O'chirish funksiyasi
-  const handleDelete = async (talentId) => {
-    // Foydalanuvchidan tasdiqlash so'rash
-    const confirmDelete = window.confirm(
-      "Haqiqatan ham ushbu talentni bazadan butunlay o'chirib tashlamoqchimisiz?",
-    );
-
-    if (confirmDelete) {
-      try {
-        // 1. Serverga DELETE so'rovi yuborish
-        await talentApi.delete(talentId);
-
-        // 2. Muvaffaqiyatli bo'lsa, xabar chiqarish
-        toast.success("Talent serverdan o'chirildi");
-
-        // 3. UI ni yangilash (o'chgan talentni ro'yxatdan olib tashlash)
-        setTalents((prevTalents) =>
-          prevTalents.filter((t) => t.id !== talentId),
-        );
-      } catch (err) {
-        console.error("O'chirishda xatolik:", err);
-        toast.error("O'chirishda xatolik yuz berdi yoki ruxsat berilmadi");
-      }
-    }
-  };
-
   useEffect(() => {
-    const fetchTalents = async () => {
-      try {
-        setLoading(true);
-        const response = await talentApi.getAll();
-        setTalents(response.data || []);
-      } catch (err) {
-        console.error("API Error:", err);
-        setError("Ma'lumotlarni yuklashda xatolik yuz berdi");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTalents();
   }, []);
 
-  // --- O'ZGARTIRILGAN QISM: LOGIN TEKSHIRUVI OLIB TASHLANDI ---
-  const handleViewProfile = (talentId) => {
-    navigate(`/talent/${talentId}`);
-  };
-  // ---------------------------------------------------------
-
-  const toggleExpand = (id) => {
-    setExpandedAbout((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const formatCount = (count) => new Intl.NumberFormat("de-DE").format(count);
-
-  const formatPrice = (price) => {
-    const value = price || 0;
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
-  };
-
-  const parseSkills = (skillsStr) => {
+  const fetchTalents = async () => {
     try {
-      if (!skillsStr) return [];
-      const parsed = JSON.parse(skillsStr);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
+      setLoading(true);
+      const response = await talentApi.getAll();
+      // Backend ma'lumot tuzilmasiga qarab tekshiramiz
+      const data = response.data?.data || response.data || [];
+      setTalents(data);
+    } catch (err) {
+      toast.error("Ma'lumotlarni yuklashda xatolik yuz berdi");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getInitials = (firstName, lastName) => {
-    const f = firstName ? firstName.charAt(0).toUpperCase() : "";
-    const l = lastName ? lastName.charAt(0).toUpperCase() : "";
-    return f + l || "?";
+  // Rasmni serverdan yoki default holatda olish funksiyasi
+  const getProfileImage = (talent) => {
+    const rawUrl = talent.profileimg_url || talent.image || talent.profilePhoto;
+
+    if (!rawUrl) return DEFAULT_AVATAR;
+    if (rawUrl.startsWith("http")) return rawUrl;
+
+    // Server path bo'lsa (masalan: /uploads/abc.jpg)
+    return `${BASE_URL}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
   };
 
-  const SkeletonCard = () => (
-    <div className="bg-white border border-gray-100 rounded-xl shadow-md overflow-hidden animate-pulse">
-      <div className="p-5 md:p-7">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-          <div className="flex items-center gap-4 md:gap-5 w-full">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200 shrink-0"></div>
-            <div className="flex-1 space-y-3">
-              <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-        </div>
-      </div>
-      <div className="p-5 md:p-8 border-t border-gray-50">
-        <div className="h-10 bg-gray-200 rounded w-full md:w-1/3 ml-auto"></div>
-      </div>
-    </div>
-  );
+  const confirmDelete = async () => {
+    if (!selectedTalentId) return;
+    try {
+      setIsDeleting(true);
+      await talentApi.delete(selectedTalentId);
+      toast.success("Talent muvaffaqiyatli o'chirildi");
+      setTalents((prev) => prev.filter((t) => t.id !== selectedTalentId));
+    } catch (err) {
+      toast.error("O'chirishda xatolik yuz berdi");
+    } finally {
+      setIsDeleting(false);
+      setIsModalOpen(false);
+      setSelectedTalentId(null);
+    }
+  };
 
-  if (error)
-    return (
-      <div className="flex justify-center items-center min-h-screen text-red-500 font-medium">
-        {error}
-      </div>
-    );
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+    }).format(price || 0);
+  };
 
   return (
     <div className="bg-[#fcfcfc] min-h-screen p-4 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-baseline gap-2 pb-3">
-            <span className="text-[20px] md:text-[25px] font-medium text-[#404040]">
-              {loading ? "..." : formatCount(talents.length)}
+      <div className="max-w-7xl mx-auto">
+        {/* HEADER */}
+        <div className="mb-6 flex justify-between items-center">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-gray-800">
+              {loading ? "..." : talents.length}
             </span>
-            <span className="text-[20px] md:text-[25px] font-medium text-[#404040] lowercase">
-              talents
-            </span>
+            <span className="text-xl text-gray-500 font-medium">talents</span>
           </div>
-          <div className="h-[1.5px] w-full bg-[#e5e7eb]"></div>
         </div>
 
-        <div className="space-y-5">
-          {loading
-            ? [1, 2, 3].map((i) => <SkeletonCard key={i} />)
-            : talents.map((talent) => {
-                const skills = parseSkills(talent.skils);
-                const isExpanded = expandedAbout[talent.id];
-                const aboutText =
-                  talent.about ||
-                  "Experience and passion in building great products...";
-
-                return (
-                  <div
-                    key={talent.id}
-                    className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
-                  >
-                    <div className="p-5 md:p-7">
-                      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                        <div className="flex items-center gap-4 md:gap-5">
-                          <div className="relative shrink-0 w-16 h-16 md:w-20 md:h-20">
-                            {talent.image ? (
-                              <img
-                                src={talent.image}
-                                alt={talent.first_name}
-                                className="w-full h-full rounded-full object-cover grayscale border border-gray-100"
-                                onError={(e) => {
-                                  e.target.style.display = "none";
-                                  if (e.target.nextSibling)
-                                    e.target.nextSibling.style.display = "flex";
-                                }}
-                              />
-                            ) : null}
-                            <div
-                              className="w-full h-full rounded-full bg-[#e6e7e9] flex items-center justify-center text-[#2e5897] text-xl md:text-3xl font-bold"
-                              style={{
-                                display: talent.image ? "none" : "flex",
+        {/* TABLE */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                    Talents name
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                    Country
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                    Occupation
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">
+                    Salary
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {!loading &&
+                  talents.map((talent) => (
+                    <tr
+                      key={talent.id}
+                      className="hover:bg-gray-50 transition-all"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-4xl overflow-hidden border-4 border-gray-100 bg-gray-50">
+                            <img
+                              src={getProfileImage(talent)}
+                              alt="Profile"
+                              className="w-full h-full object-cover grayscale  transition-all duration-300"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = DEFAULT_AVATAR;
                               }}
-                            >
-                              {getInitials(talent.first_name, talent.last_name)}
-                            </div>
-                          </div>
-                          <div>
-                            <h2 className="text-lg md:text-2xl font-bold text-[#3a3a3a] leading-tight">
-                              {talent.specialty ||
-                                talent.occupation ||
-                                "Designer"}
-                            </h2>
-                            <p className="text-gray-700 text-[16px] md:text-[20px] font-medium mt-1">
-                              {talent.first_name} {talent.last_name}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-row md:flex-col justify-between items-center md:items-end w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
-                          <div className="flex items-center gap-1 text-[#4b5563] text-sm md:text-lg font-semibold">
-                            <HiOutlineLocationMarker
-                              className="text-[#8b8d8f]"
-                              size={22}
                             />
-                            {talent.city || talent.location || "Uzbekistan"}
                           </div>
-                          <div className="text-[18px] md:text-[25px] font-bold text-[#343434] mt-2">
-                            {formatPrice(talent.minimum_salary)}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-6">
-                        <div
-                          className={`text-[#484f57] text-[15px] md:text-[18px] leading-relaxed transition-all duration-300 ${
-                            isExpanded
-                              ? "max-h-[150px] overflow-y-auto pr-2"
-                              : "line-clamp-2"
-                          }`}
-                        >
-                          {aboutText}
-                        </div>
-                        {aboutText.length > 120 && (
-                          <button
-                            onClick={() => toggleExpand(talent.id)}
-                            className="text-[#1D3D54] font-bold text-sm mt-1 hover:underline cursor-pointer"
-                          >
-                            {isExpanded ? "show less" : "...more"}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="border-t border-gray-100 mx-6"></div>
-
-                    <div className="p-5 md:p-8">
-                      <div className="flex flex-col space-y-6">
-                        <div>
-                          <h4 className="text-[#6e7074] text-[14px] md:text-[22px] font-semibold mb-4">
-                            Skills
-                          </h4>
-                          <div className="flex flex-wrap gap-2 md:gap-2.5">
-                            {skills.length > 0 ? (
-                              skills.map((s, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-3 py-1.5 bg-[#f1f5f9] text-[#475569] text-sm md:text-base font-medium rounded-lg"
-                                >
-                                  {s.skill} ({s.experience_years})
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-gray-400 text-xs italic">
-                                No skills specified
-                              </span>
-                            )}
+                          <div className="text-sm font-bold text-gray-900">
+                            {talent.first_name} {talent.last_name}
                           </div>
                         </div>
+                      </td>
 
-                        <div className="flex flex-col sm:flex-row justify-end gap-3 md:gap-4 mt-2">
-                          {/* O'chirish tugmasi */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                          <HiOutlineGlobeAlt
+                            className="text-gray-400"
+                            size={16}
+                          />
+                          {talent.country || "Uzbekistan"}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <span className="px-2 py-1 bg-indigo-50 text-indigo-900 text-[10px] font-extrabold rounded uppercase tracking-widest border border-indigo-100">
+                          {talent.occupation || "Technology"}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-bold text-gray-800">
+                          {formatPrice(
+                            talent.salary_min || talent.minimum_salary,
+                          )}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <div className="flex justify-center items-center gap-1">
                           <button
-                            onClick={() => handleDelete(talent.id)}
-                            className="px-6 md:px-10 py-3 bg-red-500 hover:bg-red-600 text-white font-[650] rounded-lg text-center active:scale-95 transition-all duration-200 shadow-sm"
+                            onClick={() => navigate(`/talent/${talent.id}`)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                           >
-                            Delete
+                            <HiOutlineEye size={20} />
                           </button>
-
-                          {/* View profile tugmasi */}
                           <button
-                            onClick={() => handleViewProfile(talent.id)}
-                            className="px-6 md:px-[60px] py-3 bg-[#1D3D54] text-white font-[650] rounded-lg text-center active:scale-95 transition-transform shadow-md"
+                            onClick={() => {
+                              setSelectedTalentId(talent.id);
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                           >
-                            View profile
+                            <HiOutlineTrash size={20} />
                           </button>
                         </div>
-
-                        <div className="flex flex-col sm:flex-row justify-end gap-3 md:gap-4 mt-2"></div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-        </div>
-
-        {talents.length === 0 && !loading && (
-          <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300 mt-5">
-            <p className="text-gray-400 font-medium">
-              Hozircha talentlar mavjud emas.
-            </p>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* DELETE MODAL (Kodni qisqartirish uchun mantiqiy qismi qoldi) */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <div className="text-center">
+              <HiExclamation className="mx-auto text-red-600 mb-4" size={48} />
+              <h3 className="text-lg font-bold mb-2">Talentni o'chirish</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Ushbu foydalanuvchini bazadan o'chirmoqchimisiz?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 px-4 py-2 border rounded-xl font-bold"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl font-bold"
+                >
+                  {isDeleting ? "..." : "O'chirish"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
