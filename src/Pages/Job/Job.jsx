@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // useNavigate qo'shildi
+import { Link, useNavigate } from "react-router-dom";
 import { jobApi } from "../../services/api";
 import { format } from "date-fns";
 import {
@@ -29,16 +29,12 @@ function Job() {
     try {
       setLoading(true);
       setError(null);
-
-      // api.js dagi interceptor avtomatik localStorage dan tokenni oladi
       const response = await jobApi.getAll();
       setJobs(response.data || []);
     } catch (err) {
       console.error("Jobs yuklashda xatolik:", err);
-
-      // AGAR TOKEN XATO BO'LSA (401 Unauthorized)
       if (err.response?.status === 401) {
-        localStorage.removeItem("adminToken"); // Eski/Xato tokenni o'chirish
+        localStorage.removeItem("adminToken");
         toast.error("Sessiya muddati tugadi, qayta kiring");
         navigate("/admin/login");
       } else {
@@ -74,7 +70,6 @@ function Job() {
     }
   };
 
-  // --- SKELETON ROW COMPONENT ---
   const SkeletonRow = () => (
     <tr className="animate-pulse">
       <td className="px-6 py-4">
@@ -87,10 +82,7 @@ function Job() {
         </div>
       </td>
       <td className="px-6 py-4">
-        <div className="flex flex-col gap-2">
-          <div className="h-3 w-32 bg-gray-200 rounded"></div>
-          <div className="h-2 w-24 bg-gray-100 rounded"></div>
-        </div>
+        <div className="h-3 w-32 bg-gray-200 rounded"></div>
       </td>
       <td className="px-6 py-4">
         <div className="h-4 w-24 bg-green-50 rounded"></div>
@@ -100,9 +92,9 @@ function Job() {
       </td>
       <td className="px-6 py-4">
         <div className="flex justify-center gap-3">
-          <div className="w-8 h-8 bg-gray-100 rounded-lg"></div>
-          <div className="w-8 h-8 bg-gray-100 rounded-lg"></div>
-          <div className="w-8 h-8 bg-gray-100 rounded-lg"></div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-8 h-8 bg-gray-100 rounded-lg"></div>
+          ))}
         </div>
       </td>
     </tr>
@@ -110,12 +102,12 @@ function Job() {
 
   if (error)
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
         <HiExclamation size={48} className="text-red-400 mb-4" />
         <p className="text-red-500 font-bold mb-4">{error}</p>
         <button
           onClick={fetchJobs}
-          className="px-4 py-2 bg-[#163D5C] text-white rounded-lg hover:bg-[#1d4f75] transition-all"
+          className="px-6 py-2 bg-[#163D5C] text-white rounded-lg hover:bg-[#1d4f75] transition-all cursor-pointer shadow-md active:scale-95"
         >
           Qayta urinish
         </button>
@@ -123,7 +115,7 @@ function Job() {
     );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen relative">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-[#163D5C]">
           Ish e'lonlari boshqaruvi
@@ -201,16 +193,21 @@ function Job() {
                       <div className="flex justify-center gap-1">
                         <Link
                           to={`/jobs/${job.id}`}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
+                          title="Ko'rish"
                         >
                           <HiOutlineEye size={20} />
                         </Link>
-                        <button className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all">
+                        <button
+                          className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all cursor-pointer"
+                          title="Tahrirlash"
+                        >
                           <HiOutlinePencilAlt size={20} />
                         </button>
                         <button
                           onClick={() => openDeleteModal(job.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                          title="O'chirish"
                         >
                           <HiOutlineTrash size={20} />
                         </button>
@@ -224,11 +221,9 @@ function Job() {
                     colSpan="5"
                     className="px-6 py-20 text-center text-gray-400"
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-lg font-medium">
-                        Hozircha e'lonlar yo'q
-                      </span>
-                    </div>
+                    <span className="text-lg font-medium">
+                      Hozircha e'lonlar yo'q
+                    </span>
                   </td>
                 </tr>
               )}
@@ -248,21 +243,21 @@ function Job() {
               E'lonni o'chirish
             </h3>
             <p className="text-sm text-center text-gray-500 mb-6">
-              Bu amalni qaytarib bo'lmaydi. Ishonchingiz komilmi?
+              Ishonchingiz komilmi?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 px-4 py-2.5 text-sm text-gray-700 font-bold border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm text-gray-700 font-bold border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Bekor qilish
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 text-sm bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 text-sm bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm active:scale-95"
               >
-                {isDeleting ? "O'chirilmoqda..." : "O'chirilsin"}
+                {isDeleting ? "..." : "O'chirilsin"}
               </button>
             </div>
           </div>
