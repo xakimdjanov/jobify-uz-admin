@@ -7,18 +7,18 @@ const api = axios.create({
 });
 
 // --- INTERCEPTORS ---
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   },
-// );
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 // --- TALENT API ---
 export const talentApi = {
@@ -44,6 +44,16 @@ export const talentApi = {
   search: (query) => api.get(`/talent/search?query=${query}`),
   update: (id, formData) => api.put(`/talent/${id}`, formData),
   delete: (id) => api.delete(`/talent/${id}`),
+};
+
+// --- ADMIN API --- \\ 
+export const adminApi = {
+  register: (data) => api.post("/admin/register", data),
+  login: (data) => api.post("/admin/login", data),
+  getAll: () => api.get("/admin"),
+  getById: (id) => api.get(`/admin/${id}`),
+  update: (id, data) => api.put(`/admin/${id}`, data),
+  delete: (id) => api.delete(`/admin/${id}`),
 };
 
 export const companyApi = {
@@ -194,10 +204,19 @@ export const confirmResetPassword = async (email, code, newPassword) => {
 
 // --- NOTIFICATION API ---
 export const notificationApi = {
-  send: (data) => api.post("/notifications", data),
+  // Data va tokenni qabul qiladi
+  send: (data, token) => api.post("/notifications", data, {
+    headers: { Authorization: `Bearer ${token}` }
+  }),
+  
   getAll: () => api.get("/notifications"),
+  
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
-  delete: (id) => api.delete(`/notifications/${id}`), //notification
+  
+  // ID va tokenni qabul qiladi
+  delete: (id, token) => api.delete(`/notifications/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  }),
 };
 
 export default api;

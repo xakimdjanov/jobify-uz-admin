@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 
 import Sidebar from "./Pages/Sidebar/Sidebar";
@@ -11,12 +11,24 @@ import Message from "./Pages/Message/Message.jsx";
 import Notification from "./Pages/Notificatons/Notification.jsx";
 import TalentDetail from "./Pages/Talent/TalentDetail.jsx";
 import JobDetailPageCompany from "./Pages/Job/JobDetailPage.jsx";
+import Login from "./Pages/Admin/Login";
+import ProtectedRoute from "./Pages/ProtectedRoute/ProtectedRoute.jsx";
 
 function App() {
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/admin/login";
+
   return (
     <div className="flex min-h-screen bg-[#F8F9FB]">
-      <Sidebar />
-      <main className="flex-1 p-5 md:p-10 transition-all duration-300 md:ml-64 pb-20 md:pb-10">
+      {!isLoginPage && <Sidebar />}
+
+      <main
+        className={`flex-1 transition-all duration-300 ${
+          isLoginPage
+            ? "p-0 h-screen flex items-center justify-center"
+            : "p-5 md:p-10 md:ml-64 pb-20 md:pb-10"
+        }`}
+      >
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
