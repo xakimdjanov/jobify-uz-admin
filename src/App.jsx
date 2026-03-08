@@ -4,6 +4,7 @@ import "./App.css";
 import Sidebar from "./Pages/Sidebar/Sidebar";
 import Dashboard from "./Pages/Dashboard/Dashboard.jsx";
 import Company from "./Pages/Company/Company.jsx";
+import CompanyDetail from "./Pages/Company/CompanyDetail.jsx";
 import Talent from "./Pages/Talent/Talent.jsx";
 import Jobs from "./Pages/Job/Job.jsx";
 import Message from "./Pages/Message/Message.jsx";
@@ -29,30 +30,16 @@ function App() {
         }`}
       >
         <Routes>
-          <Route path="/admin/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/admin/login" replace />} />
-
-          <Route
-            path="/*"
-            element={
-              // <ProtectedRoute>
-                <Routes>
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="company" element={<Company />} />
-                  <Route path="message" element={<Message />} />
-                  <Route path="notification" element={<Notification />} />
-                  <Route path="talent" element={<Talent />} />
-                  <Route path="talent/:id" element={<TalentDetail />} />
-                  <Route path="jobs" element={<Jobs />} />
-                  <Route path="jobs/:id" element={<JobDetailPageCompany />} />
-                  <Route
-                    path="*"
-                    element={<Navigate to="/dashboard" replace />}
-                  />
-                </Routes>
-              // </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/company" element={<Company />} />
+          <Route path="/company/:id" element={<CompanyDetail />} />
+          <Route path="/message" element={<Message />} />
+          <Route path="/notification" element={<Notification />} />
+          <Route path="/talent" element={<Talent />} />
+          <Route path="/talent/:id" element={<TalentDetail />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetailPageCompany />} />
         </Routes>
       </main>
     </div>
