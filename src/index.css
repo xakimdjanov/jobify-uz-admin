@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
-button{
+button {
     cursor: pointer;
+}
+
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* Dark mode kontekstiga qarab body fonini ham o'zgartirish yaxshi amaliyot */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
