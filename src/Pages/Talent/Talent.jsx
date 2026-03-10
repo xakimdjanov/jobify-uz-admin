@@ -106,7 +106,7 @@ function Talents() {
               {/* Matn qismi */}
               <div className="flex flex-col">
                 <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                  Total Talents
+                  Talentlar
                 </h1>
              
               </div>
@@ -137,16 +137,16 @@ function Talents() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                    Talents name
+                    Talentlar
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                    Country
+                    Shahar
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                    Occupation
+                    Kasb
                   </th>
                   <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-400 text-center">
-                    Actions
+                    Amallar
                   </th>
                 </tr>
               </thead>
@@ -154,7 +154,7 @@ function Talents() {
                 {!loading &&
                   filteredTalents.map(
                     (
-                      talent, // filteredTalents ishlatildi
+                      talent, 
                     ) => (
                       <tr
                         key={talent.id}

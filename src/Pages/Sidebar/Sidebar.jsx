@@ -34,11 +34,11 @@ function Sidebar() {
 
     const navItems = [
         { name: 'Dashboard', path: '/dashboard', icon: <IoStatsChart size={20} />, mobile: true },
-        { name: 'Company', path: '/company', icon: <HiOutlineBuildingOffice2 size={22} />, mobile: true },
+        { name: 'Kompaniya', path: '/company', icon: <HiOutlineBuildingOffice2 size={22} />, mobile: true },
         { name: 'Talent', path: '/talent', icon: <MdOutlinePersonOutline size={22} />, mobile: true },
-        { name: 'Jobs', path: '/jobs', icon: <MdOutlineWork size={22} />, mobile: true },
-        { name: 'Message', path: '/message', icon: <MdQuestionAnswer size={22} />, mobile: false },
-        { name: 'Notification', path: '/notification', icon: <MdNotificationsNone size={22} />, mobile: true }
+        { name: 'Ish', path: '/jobs', icon: <MdOutlineWork size={22} />, mobile: true },
+        { name: 'Xabar', path: '/message', icon: <MdQuestionAnswer size={22} />, mobile: false },
+        { name: 'Bildirishnoma', path: '/notification', icon: <MdNotificationsNone size={22} />, mobile: true }
     ];
 
     const handleLogout = () => {
