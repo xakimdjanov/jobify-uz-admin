@@ -23,11 +23,18 @@ function Notification() {
         message: '',
     });
 
+    // 1. Tokenni olish funksiyasi (Rasmga asosan 'token' kalitidan)
+    const getAdminToken = () => localStorage.getItem('token');
+
     const fetchNotifications = async () => {
         try {
             const res = await notificationApi.getAll();
             setNotifications((res.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-        } catch (error) { console.error(error); } finally { setLoading(false); }
+        } catch (error) { 
+            console.error(error); 
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const loadUsers = async (group) => {
@@ -35,16 +42,16 @@ function Notification() {
         try {
             const res = group === 'talent' ? await talentApi.getAll() : await companyApi.getAll();
             setUsers(res.data || []);
-        } catch (error) { toast.error("Ma'lumotlarni yuklashda xatolik!"); }
+        } catch (error) { 
+            toast.error("Ma'lumotlarni yuklashda xatolik!"); 
+        }
     };
 
-    // O'chirish funksiyasi
+    // 2. O'chirish funksiyasi (Token bilan)
     const handleDelete = async (id) => {
         if (!window.confirm("Ushbu bildirishnomani o'chirmoqchimisiz?")) return;
 
-        // Rasmda ko'rsatilganidek 'adminToken' kalitidan olamiz
-        const token = localStorage.getItem('adminToken');
-
+        const token = getAdminToken();
         if (!token) {
             toast.error("Admin token topilmadi! Tizimga qayta kiring.");
             return;
@@ -52,13 +59,12 @@ function Notification() {
 
         try {
             await notificationApi.delete(id, token);
-
             setNotifications(prev => prev.filter(n => (n.id !== id && n._id !== id)));
             toast.info("Xabar muvaffaqiyatli o'chirildi");
         } catch (error) {
             console.error("Delete error:", error);
             if (error.response?.status === 401) {
-                toast.error("Sessiya muddati tugagan yoki ruxsat yo'q!");
+                toast.error("Ruxsat yo'q yoki sessiya tugagan!");
             } else {
                 toast.error("O'chirishda xatolik yuz berdi");
             }
@@ -77,9 +83,18 @@ function Notification() {
         });
     }, [users, searchTerm]);
 
+    // 3. Yuborish funksiyasi (Token bilan)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.title.trim() || !formData.message.trim()) return toast.warning("Sarlavha va xabarni to'ldiring!");
+        const token = getAdminToken();
+
+        if (!token) {
+            return toast.error("Token topilmadi! Iltimos, qayta kiring.");
+        }
+
+        if (!formData.title.trim() || !formData.message.trim()) {
+            return toast.warning("Sarlavha va xabarni to'ldiring!");
+        }
 
         if (formData.sendMode === 'single' && !formData.selectedId) {
             return toast.error("Iltimos, foydalanuvchini tanlang!");
@@ -106,7 +121,7 @@ function Notification() {
                         title: formData.title,
                         message: formData.message,
                         type: "broadcast"
-                    });
+                    }, token); // API-ga token uzatildi
                 }
                 toast.update(toastId, { render: `Muvaffaqiyatli! ${total} ta manzilga yuborildi.`, type: "success", isLoading: false, autoClose: 3000 });
             } else {
@@ -115,7 +130,7 @@ function Notification() {
                     message: formData.message,
                     [formData.targetGroup === 'talent' ? 'talent_id' : 'company_id']: parseInt(formData.selectedId)
                 };
-                await notificationApi.send(payload);
+                await notificationApi.send(payload, token); // API-ga token uzatildi
                 toast.update(toastId, { render: "Xabar yuborildi!", type: "success", isLoading: false, autoClose: 3000 });
             }
 
@@ -123,7 +138,8 @@ function Notification() {
             setSearchTerm('');
             fetchNotifications();
         } catch (error) {
-            toast.update(toastId, { render: error.message || "Xatolik yuz berdi!", type: "error", isLoading: false, autoClose: 3000 });
+            console.error("Send error:", error);
+            toast.update(toastId, { render: error.response?.data?.message || "Xatolik yuz berdi!", type: "error", isLoading: false, autoClose: 3000 });
         } finally {
             setSending(false);
         }
@@ -139,7 +155,7 @@ function Notification() {
                         <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
                             <MdNotificationsNone className="text-blue-600" /> Bildirishnomalar
                         </h1>
-                        <p className="text-slate-500 font-medium">Boshqaruv paneli v2.0</p>
+                        <p className="text-slate-500 font-medium">Admin Boshqaruv Paneli</p>
                     </div>
                 </header>
 
@@ -191,7 +207,7 @@ function Notification() {
                                             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                             <input
                                                 type="text"
-                                                placeholder="Qidirish..."
+                                                placeholder="Ism yoki email orqali qidirish..."
                                                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -247,7 +263,7 @@ function Notification() {
                         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 px-2">
                             <MdCheckCircle className="text-green-500" /> Oxirgi yuborilganlar
                         </h3>
-                        <div className="space-y-3 max-h-175 overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
                                 <div className="bg-white p-10 rounded-[28px] text-center text-slate-400">Yuklanmoqda...</div>
                             ) : notifications.length === 0 ? (
@@ -267,7 +283,6 @@ function Notification() {
                                                 </span>
                                             </div>
                                         </div>
-                                        {/* O'chirish tugmasi - Kursor va effektlar qo'shildi */}
                                         <button
                                             onClick={() => handleDelete(note.id || note._id)}
                                             className="absolute top-4 right-4 text-slate-300 hover:text-red-500 hover:scale-120 transition-all cursor-pointer p-1"
