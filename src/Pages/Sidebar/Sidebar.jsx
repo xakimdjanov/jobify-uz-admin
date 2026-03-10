@@ -13,7 +13,7 @@ import { IoStatsChart } from "react-icons/io5";
 function Sidebar() {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-    
+
     // Admin ma'lumotlari uchun holat
     const [admin, setAdmin] = useState({
         fullname: "Admin",
@@ -49,15 +49,15 @@ function Sidebar() {
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 w-full h-17.5 border-t flex flex-row items-center justify-around z-100 bg-white border-gray-100 md:flex-col md:w-64 md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all">
+            <div className="fixed bottom-0 left-0 w-full h-17.5 border-t flex flex-row items-center justify-around z-100 bg-white border-gray-100 md:flex-col md:w-64 md:h-screen md:border-r md:border-t-0 md:py-6 md:px-4 md:justify-start transition-all rounded-[50px]">
 
                 {/* Admin Profil qismi (Faqat Desktop) */}
                 <div className="hidden md:flex items-center gap-3 mb-8 px-2 w-full border-b pb-6 border-gray-50">
                     <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#163D5C]/10 bg-gray-100 shrink-0">
                         {admin.profileimg_url ? (
-                            <img 
-                                src={admin.profileimg_url} 
-                                alt="Admin Profile" 
+                            <img
+                                src={admin.profileimg_url}
+                                alt="Admin Profile"
                                 className="w-full h-full object-cover"
                             />
                         ) : (
@@ -93,7 +93,7 @@ function Sidebar() {
 
                     <button
                         onClick={() => setIsLogoutModalOpen(true)}
-                        className="cursor-pointer hidden md:flex items-center gap-3 px-4 py-3 rounded-xl transition-all mt-auto w-full text-red-500 hover:bg-red-50"
+                        className="cursor-pointer hidden md:flex items-center gap-3 px-4 py-3 rounded-xl transition-all w-full text-red-500 hover:bg-red-50 mt-[200px]"
                     >
                         <MdLogout size={20} className="shrink-0" />
                         <span className="text-[14px] font-semibold">Logout</span>
