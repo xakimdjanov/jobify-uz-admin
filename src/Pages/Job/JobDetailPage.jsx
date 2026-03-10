@@ -28,40 +28,38 @@ import {
 } from "react-icons/fi";
 import { formatDistanceToNow } from "date-fns";
 import toast, { Toaster } from "react-hot-toast";
+import { useTheme } from "../../context/ThemeContext"; // ThemeContext ulandi
 
-const SkeletonLoader = () => (
-  <div className="max-w-5xl mx-auto animate-pulse">
-    <div className="flex flex-col md:flex-row justify-between mb-8 gap-4">
-      <div className="h-16 rounded-2xl flex-1 bg-gray-200"></div>
-      <div className="h-16 rounded-2xl w-full md:w-40 bg-gray-200"></div>
-    </div>
-    <div className="rounded-[2.5rem] p-10 mb-10 bg-white border-gray-100 border shadow-sm">
-      <div className="flex flex-col md:flex-row gap-6 mb-8">
-        <div className="w-24 h-24 rounded-full bg-gray-200"></div>
-        <div className="flex-1 space-y-4">
-          <div className="h-8 rounded w-1/3 bg-gray-200"></div>
-          <div className="h-6 rounded w-1/4 bg-gray-200"></div>
+const SkeletonLoader = () => {
+  const { settings } = useTheme();
+  return (
+    <div className="max-w-5xl mx-auto animate-pulse">
+      <div className="flex flex-col md:flex-row justify-between mb-8 gap-4">
+        <div className={`h-16 rounded-2xl flex-1 ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+        <div className={`h-16 rounded-2xl w-full md:w-40 ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+      </div>
+      <div className={`rounded-[2.5rem] p-10 mb-10 border shadow-sm ${settings.darkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-100"
+        }`}>
+        <div className="flex flex-col md:flex-row gap-6 mb-8">
+          <div className={`w-24 h-24 rounded-full ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className="flex-1 space-y-4">
+            <div className={`h-8 rounded w-1/3 ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+            <div className={`h-6 rounded w-1/4 ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className={`h-4 rounded w-full ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className={`h-4 rounded w-5/6 ${settings.darkMode ? "bg-zinc-800" : "bg-gray-200"}`}></div>
         </div>
       </div>
-      <div className="space-y-3">
-        <div className="h-4 rounded w-full bg-gray-200"></div>
-        <div className="h-4 rounded w-5/6 bg-gray-200"></div>
-      </div>
     </div>
-    <div className="space-y-6">
-      {[1, 2].map((i) => (
-        <div
-          key={i}
-          className="h-44 border rounded-[2rem] bg-white border-gray-100"
-        ></div>
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
 const JobDetailPageCompany = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { settings } = useTheme(); // Dark mode holati
 
   const [job, setJob] = useState(null);
   const [allTalents, setAllTalents] = useState([]);
@@ -222,23 +220,6 @@ const JobDetailPageCompany = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const getInitials = (firstName, lastName) => {
-    const f = firstName ? firstName.charAt(0).toUpperCase() : "";
-    const l = lastName ? lastName.charAt(0).toUpperCase() : "";
-    return f + l || "?";
-  };
-
-  const parseTalentSkills = (skillsStr) => {
-    try {
-      if (!skillsStr) return [];
-      const parsed =
-        typeof skillsStr === "string" ? JSON.parse(skillsStr) : skillsStr;
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
-    }
-  };
-
   const getJobSkills = () => {
     if (!job?.skils) return [];
     if (typeof job.skils === "string") {
@@ -250,60 +231,42 @@ const JobDetailPageCompany = () => {
     return Array.isArray(job.skils) ? job.skils : [];
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-    }).format(price || 0);
-  };
-
-  const matchedTalents = allTalents.filter((talent) => {
-    if (!job || !job.skils) return false;
-    const isAlreadyApplied = applications.some(
-      (app) => Number(app.talent_id) === Number(talent.id),
-    );
-    if (isAlreadyApplied) return false;
-    const jobSkillsArr = getJobSkills().map((s) => s.toLowerCase());
-    const talentSkills = parseTalentSkills(talent.skils);
-    return talentSkills.some((t) =>
-      jobSkillsArr.includes(t.skill?.toLowerCase()),
-    );
-  });
-
   if (loading)
     return (
-      <div className="w-full min-h-screen p-8 bg-[#F8F9FA]">
+      <div className={`w-full min-h-screen p-8 transition-colors duration-300 ${settings.darkMode ? "bg-[#121212]" : "bg-[#F8F9FA]"}`}>
         <SkeletonLoader />
       </div>
     );
 
-  if (!job)
-    return <div className="p-10 text-center text-red-500">Job not found</div>;
+  if (!job) return <div className="p-10 text-center text-red-500">Job not found</div>;
 
   return (
-    <div className="w-full min-h-screen p-3 sm:p-6 md:p-8 text-left font-sans transition-colors duration-300 bg-[#F8F9FA] text-gray-800">
+    <div className={`w-full min-h-screen p-3 sm:p-6 md:p-8 text-left font-sans transition-colors duration-300 ${settings.darkMode ? "bg-[#0f0f0f] text-zinc-100" : "bg-[#F8F9FA] text-gray-800"
+      }`}>
       <Toaster position="top-center" />
 
       <div className="max-w-5xl mx-auto relative">
         {/* --- DELETE MODAL --- */}
         {isDeleteModalOpen && (
           <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl bg-white">
+            <div className={`rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl transition-colors ${settings.darkMode ? "bg-zinc-900" : "bg-white"
+              }`}>
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-50">
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${settings.darkMode ? "bg-red-900/20" : "bg-red-50"
+                  }`}>
                   <FiAlertCircle size={40} className="text-red-500" />
                 </div>
-                <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                <h2 className={`text-2xl font-bold mb-2 ${settings.darkMode ? "text-zinc-100" : "text-gray-800"}`}>
                   Ishonchingiz komilmi?
                 </h2>
-                <p className="text-gray-500 mb-6">
+                <p className={`mb-6 ${settings.darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                   Bu e'lonni butunlay o'chirib tashlaysizmi?
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setIsDeleteModalOpen(false)}
-                    className="flex-1 py-3.5 font-bold rounded-2xl bg-gray-100 text-gray-700"
+                    className={`flex-1 py-3.5 font-bold rounded-2xl transition-colors ${settings.darkMode ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"
+                      }`}
                   >
                     Bekor qilish
                   </button>
@@ -318,67 +281,65 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
+
         {/* --- INVITE MODAL --- */}
         {isInviteModalOpen && (
           <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="rounded-[2.5rem] p-8 max-w-lg w-full shadow-2xl relative bg-white">
+            <div className={`rounded-[2.5rem] p-8 max-w-lg w-full shadow-2xl relative transition-colors ${settings.darkMode ? "bg-zinc-900" : "bg-white"
+              }`}>
               <button
                 onClick={() => setIsInviteModalOpen(false)}
-                className="absolute top-6 right-6 p-2 text-gray-400 hover:bg-gray-100 rounded-full"
+                className="absolute top-6 right-6 p-2 text-gray-400 hover:bg-gray-100/10 rounded-full"
               >
                 <MdClose size={24} />
               </button>
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${settings.darkMode ? "bg-blue-900/20 text-blue-400" : "bg-blue-50 text-blue-600"
+                  }`}>
                   <FiSend size={28} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className={`text-xl font-bold ${settings.darkMode ? "text-zinc-100" : "text-gray-800"}`}>
                     Taklif yuborish
                   </h2>
                   <p className="text-gray-500 text-sm">
-                    Nomzod: {selectedTalent?.first_name}{" "}
-                    {selectedTalent?.last_name}
+                    Nomzod: {selectedTalent?.first_name} {selectedTalent?.last_name}
                   </p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase">
-                    Sarlavha
-                  </label>
+                  <label className="text-xs font-bold text-gray-400 uppercase">Sarlavha</label>
                   <input
                     type="text"
                     value={inviteData.title}
-                    onChange={(e) =>
-                      setInviteData({ ...inviteData, title: e.target.value })
-                    }
-                    className="w-full mt-1 px-5 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border bg-gray-50 border-gray-100"
+                    onChange={(e) => setInviteData({ ...inviteData, title: e.target.value })}
+                    className={`w-full mt-1 px-5 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border transition-colors ${settings.darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-gray-50 border-gray-100"
+                      }`}
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase">
-                    Xabar
-                  </label>
+                  <label className="text-xs font-bold text-gray-400 uppercase">Xabar</label>
                   <textarea
                     rows="4"
                     value={inviteData.message}
-                    onChange={(e) =>
-                      setInviteData({ ...inviteData, message: e.target.value })
-                    }
-                    className="w-full mt-1 px-5 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 resize-none border bg-gray-50 border-gray-100"
+                    onChange={(e) => setInviteData({ ...inviteData, message: e.target.value })}
+                    className={`w-full mt-1 px-5 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 resize-none border transition-colors ${settings.darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-gray-50 border-gray-100"
+                      }`}
                   />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setIsInviteModalOpen(false)}
-                    className="flex-1 py-4 font-bold rounded-2xl bg-gray-100 text-gray-600"
+                    className={`flex-1 py-4 font-bold rounded-2xl transition-colors ${settings.darkMode ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
+                      }`}
                   >
                     Bekor qilish
                   </button>
                   <button
                     onClick={handleConfirmInvitation}
-                    className="flex-1 py-4 bg-[#1D3D54] text-white font-bold rounded-2xl shadow-lg"
+                    className={`flex-1 py-4 font-bold rounded-2xl shadow-lg ${settings.darkMode ? "bg-blue-600 text-white" : "bg-[#1D3D54] text-white"
+                      }`}
                   >
                     Yuborish
                   </button>
@@ -387,39 +348,30 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
+
         {/* --- EDIT MODAL --- */}
         {isEditModalOpen && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="w-full max-w-2xl rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative max-h-[90vh] overflow-y-auto text-left bg-white">
+            <div className={`w-full max-w-2xl rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative max-h-[90vh] overflow-y-auto text-left transition-colors ${settings.darkMode ? "bg-zinc-900" : "bg-white"
+              }`}>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="absolute top-6 right-6 p-2 text-gray-400 hover:bg-gray-100 rounded-full"
+                className="absolute top-6 right-6 p-2 text-gray-400 hover:bg-gray-100/10 rounded-full"
               >
                 <MdClose size={28} />
               </button>
-              <h2 className="text-2xl font-bold mb-8 text-[#343C44]">
+              <h2 className={`text-2xl font-bold mb-8 ${settings.darkMode ? "text-zinc-200" : "text-[#343C44]"}`}>
                 Edit Job Position
               </h2>
-              <form
-                onSubmit={handleUpdateJob}
-                className="grid grid-cols-1 md:grid-cols-2 gap-5"
-              >
+              <form onSubmit={handleUpdateJob} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {[
                   { label: "Occupation", name: "occupation", type: "text" },
                   { label: "Location", name: "location", type: "text" },
-                  {
-                    label: "Salary Min ($)",
-                    name: "salary_min",
-                    type: "number",
-                  },
-                  {
-                    label: "Salary Max ($)",
-                    name: "salary_max",
-                    type: "number",
-                  },
+                  { label: "Salary Min ($)", name: "salary_min", type: "number" },
+                  { label: "Salary Max ($)", name: "salary_max", type: "number" },
                 ].map((field) => (
                   <div key={field.name} className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-[#343C44]">
+                    <label className={`text-sm font-bold ${settings.darkMode ? "text-zinc-400" : "text-[#343C44]"}`}>
                       {field.label}
                     </label>
                     <input
@@ -427,37 +379,39 @@ const JobDetailPageCompany = () => {
                       type={field.type}
                       value={formData[field.name]}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border bg-[#F8F9FA] border-gray-100 text-gray-800 focus:border-[#5CB85C] outline-none"
+                      className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${settings.darkMode
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-blue-500"
+                          : "bg-[#F8F9FA] border-gray-100 text-gray-800 focus:border-[#5CB85C]"
+                        }`}
                       required={field.name === "occupation"}
                     />
                   </div>
                 ))}
                 <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="text-sm font-bold text-[#343C44]">
-                    Skills (comma separated)
-                  </label>
+                  <label className={`text-sm font-bold ${settings.darkMode ? "text-zinc-400" : "text-[#343C44]"}`}>Skills</label>
                   <input
                     name="skils"
                     value={formData.skils}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl border bg-[#F8F9FA] border-gray-100"
+                    className={`w-full px-4 py-3 rounded-xl border transition-colors ${settings.darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-[#F8F9FA] border-gray-100"
+                      }`}
                   />
                 </div>
                 <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="text-sm font-bold text-[#343C44]">
-                    Description
-                  </label>
+                  <label className={`text-sm font-bold ${settings.darkMode ? "text-zinc-400" : "text-[#343C44]"}`}>Description</label>
                   <textarea
                     name="description"
                     rows="4"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl border resize-none bg-[#F8F9FA] border-gray-100"
+                    className={`w-full px-4 py-3 rounded-xl border resize-none transition-colors ${settings.darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-[#F8F9FA] border-gray-100"
+                      }`}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="md:col-span-2 w-full mt-4 py-4 bg-[#5CB85C] text-white font-bold rounded-2xl hover:bg-[#4cae4c] transition-colors"
+                  className={`md:col-span-2 w-full mt-4 py-4 text-white font-bold rounded-2xl transition-all ${settings.darkMode ? "bg-blue-600 hover:bg-blue-700" : "bg-[#5CB85C] hover:bg-[#4cae4c]"
+                    }`}
                 >
                   Update Job Details
                 </button>
@@ -465,44 +419,45 @@ const JobDetailPageCompany = () => {
             </div>
           </div>
         )}
+
         {/* --- HEADER --- */}
         <div className="w-full mb-6 mt-2 md:mt-0">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 sm:p-6 rounded-2xl bg-white border border-gray-100 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.06)]">
-            {/* Sarlavha - Hajmi kichraytirildi (text-xl sm:text-2xl) */}
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-700 tracking-tight">
+          <div className={`flex flex-col md:flex-row justify-between items-center gap-4 p-4 sm:p-6 rounded-2xl border transition-all duration-300 ${settings.darkMode ? "bg-zinc-900 border-zinc-800 shadow-none" : "bg-white border-gray-100 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.06)]"
+            }`}>
+            <h1 className={`text-xl sm:text-2xl font-bold tracking-tight transition-colors ${settings.darkMode ? "text-zinc-100" : "text-slate-700"
+              }`}>
               Job Details
             </h1>
 
-            {/* --- BACK BUTTON --- */}
             <button
               onClick={() => navigate("/jobs")}
-              className="group flex items-center justify-center gap-2 font-bold w-full sm:w-auto px-6 py-2.5 border-2 rounded-xl transition-all duration-300 border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white active:scale-[0.97] hover:shadow-md hover:shadow-[#1d3d5420]"
+              className={`group flex items-center justify-center gap-2 font-bold w-full sm:w-auto px-6 py-2.5 border-2 rounded-xl transition-all duration-300 ${settings.darkMode
+                  ? "border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
+                  : "border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white"
+                } active:scale-[0.97]`}
             >
-              <MdKeyboardArrowLeft
-                size={22}
-                className="transition-transform duration-300 group-hover:-translate-x-1"
-              />
+              <MdKeyboardArrowLeft size={22} className="transition-transform duration-300 group-hover:-translate-x-1" />
               <span className="text-[16px]">Back to Jobs</span>
             </button>
           </div>
         </div>
 
-        <div className="rounded-[2.5rem] p-6 sm:p-10 shadow-sm border mb-10 relative transition-colors bg-white border-gray-100">
+        {/* --- MAIN CARD --- */}
+        <div className={`rounded-[2.5rem] p-6 sm:p-10 shadow-sm border mb-10 relative transition-all duration-300 ${settings.darkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-100"
+          }`}>
           <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start gap-8 mb-8 lg:pr-12">
             <div className="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
-              <div className="w-24 h-24 shrink-0 rounded-full bg-[#00A7AC] flex items-center justify-center text-white text-4xl font-bold overflow-hidden border-4 border-gray-50/10 shadow-sm">
+              <div className={`w-24 h-24 shrink-0 rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden border-4 shadow-sm ${settings.darkMode ? "bg-zinc-800 border-zinc-700" : "bg-[#00A7AC] border-gray-50/10"
+                }`}>
                 {job.company?.profileimg_url ? (
-                  <img
-                    src={job.company.profileimg_url}
-                    className="w-full h-full object-cover"
-                    alt="logo"
-                  />
+                  <img src={job.company.profileimg_url} className="w-full h-full object-cover" alt="logo" />
                 ) : (
                   job.occupation?.charAt(0) || "J"
                 )}
               </div>
               <div className="max-w-md">
-                <h2 className="text-2xl sm:text-3xl font-bold leading-tight text-[#343C44]">
+                <h2 className={`text-2xl sm:text-3xl font-bold leading-tight transition-colors ${settings.darkMode ? "text-zinc-100" : "text-[#343C44]"
+                  }`}>
                   {job.occupation}
                 </h2>
                 <p className="font-[600] text-[22px] mt-1 text-[#8E8E8E]">
@@ -510,39 +465,40 @@ const JobDetailPageCompany = () => {
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-1 mt-2 text-base sm:text-lg font-medium text-[#a7a6a6]">
                   <MdLocationOn className="shrink-0" />
-                  <span>
-                    {job.location} ({job.workplace_type || "Remote"})
-                  </span>
+                  <span>{job.location} ({job.workplace_type || "Remote"})</span>
                 </div>
               </div>
             </div>
-            <div className="text-center lg:text-right w-full lg:w-auto border-t lg:border-none pt-6 lg:pt-0 mt-2 lg:mt-0 border-gray-100">
+            <div className={`text-center lg:text-right w-full lg:w-auto border-t lg:border-none pt-6 lg:pt-0 mt-2 lg:mt-0 transition-colors ${settings.darkMode ? "border-zinc-800" : "border-gray-100"
+              }`}>
               <p className="text-base sm:text-[18px] font-[600] mb-1 text-[#8E8E8E]">
-                {job.createdAt
-                  ? formatDistanceToNow(new Date(job.createdAt), {
-                      addSuffix: true,
-                    })
-                  : "Recently"}
+                {job.createdAt ? formatDistanceToNow(new Date(job.createdAt), { addSuffix: true }) : "Recently"}
               </p>
-              <p className="text-2xl sm:text-[28px] font-bold whitespace-nowrap text-[#4B5563]">
-                ${job.salary_min?.toLocaleString()}{" "}
-                {job.salary_max ? `- $${job.salary_max.toLocaleString()}` : ""}
+              <p className={`text-2xl sm:text-[28px] font-bold whitespace-nowrap ${settings.darkMode ? "text-zinc-300" : "text-[#4B5563]"
+                }`}>
+                ${job.salary_min?.toLocaleString()} {job.salary_max ? `- $${job.salary_max.toLocaleString()}` : ""}
               </p>
             </div>
           </div>
-          <p className="text-base sm:text-lg leading-relaxed mb-8 text-center md:text-left text-[#343C44]">
+          <p className={`text-base sm:text-lg leading-relaxed mb-8 text-center md:text-left transition-colors ${settings.darkMode ? "text-zinc-400" : "text-[#343C44]"
+            }`}>
             {job.description}
           </p>
-          <div className="pt-6 border-t flex flex-col md:flex-row justify-between items-center gap-6 border-gray-50">
+          <div className={`pt-6 border-t flex flex-col md:flex-row justify-between items-center gap-6 transition-colors ${settings.darkMode ? "border-zinc-800" : "border-gray-50"
+            }`}>
             <div className="w-full">
-              <h4 className="font-bold mb-4 uppercase text-xs sm:text-sm tracking-widest text-center md:text-left text-[#343C44]">
+              <h4 className={`font-bold mb-4 uppercase text-xs sm:text-sm tracking-widest text-center md:text-left ${settings.darkMode ? "text-zinc-500" : "text-[#343C44]"
+                }`}>
                 Required skills
               </h4>
               <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-3">
                 {getJobSkills().map((skill, index) => (
                   <span
                     key={index}
-                    className="px-4 sm:px-5 py-1.5 sm:py-2 rounded-xl font-semibold border text-sm sm:text-base bg-[#F3F4F6] border-gray-100 text-[#4B5563]"
+                    className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-xl font-semibold border text-sm sm:text-base transition-colors ${settings.darkMode
+                        ? "bg-zinc-800 border-zinc-700 text-zinc-300"
+                        : "bg-[#F3F4F6] border-gray-100 text-[#4B5563]"
+                      }`}
                   >
                     {skill}
                   </span>
@@ -552,13 +508,19 @@ const JobDetailPageCompany = () => {
             <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="p-4 rounded-2xl transition-all border bg-gray-50 border-gray-100 text-gray-400 hover:bg-[#73dd73] hover:text-white"
+                className={`p-4 rounded-2xl transition-all border ${settings.darkMode
+                    ? "bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-blue-600 hover:text-white"
+                    : "bg-gray-50 border-gray-100 text-gray-400 hover:bg-[#73dd73] hover:text-white"
+                  }`}
               >
                 <FiEdit2 size={22} />
               </button>
               <button
                 onClick={() => setIsDeleteModalOpen(true)}
-                className="p-4 rounded-2xl transition-all border bg-red-50 border-red-100 text-red-500 hover:bg-red-500 hover:text-white"
+                className={`p-4 rounded-2xl transition-all border ${settings.darkMode
+                    ? "bg-red-900/20 border-red-900/30 text-red-500 hover:bg-red-500 hover:text-white"
+                    : "bg-red-50 border-red-100 text-red-500 hover:bg-red-500 hover:text-white"
+                  }`}
               >
                 <FiTrash2 size={22} />
               </button>
