@@ -93,7 +93,7 @@ function Sidebar() {
 
                     <button
                         onClick={() => setIsLogoutModalOpen(true)}
-                        className="cursor-pointer hidden md:flex items-center gap-3 px-4 py-3 rounded-xl transition-all w-full text-red-500 hover:bg-red-50 mt-[200px]"
+                        className="cursor-pointer hidden md:flex items-center gap-3 px-4 py-3 rounded-xl transition-all w-full text-red-500 hover:bg-red-50 mt-50"
                     >
                         <MdLogout size={20} className="shrink-0" />
                         <span className="text-[14px] font-semibold">Logout</span>
