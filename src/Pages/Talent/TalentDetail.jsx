@@ -65,7 +65,7 @@ const TalentDetail = () => {
     try {
       const response = await axios.post(
         "https://jobify-backend-production-6a97.up.railway.app/api/notifications",
-        payload,
+        payload
       );
       if (response.status === 200 || response.status === 201) {
         toast.success(`Xabarnoma ${talent.first_name}ga yuborildi! 🎉`);
@@ -74,7 +74,7 @@ const TalentDetail = () => {
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Xabarnoma yuborishda xatolik",
+        error.response?.data?.message || "Xabarnoma yuborishda xatolik"
       );
     }
   };
@@ -83,8 +83,7 @@ const TalentDetail = () => {
     "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=";
 
   const cardBg = "bg-white border-gray-50 shadow-sm";
-  const btnPrimary =
-    "bg-[#163D5C] hover:bg-[#163D5C]/90 text-white transition-all active:scale-95 shadow-sm";
+  const btnPrimary = "bg-[#163D5C] hover:bg-[#163D5C]/90 text-white transition-all active:scale-95 shadow-sm";
 
   const DetailSkeleton = () => (
     <div className="max-w-5xl mx-auto px-4 mt-8 animate-pulse">
@@ -139,7 +138,7 @@ const TalentDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FDFEFF] pb-20">
+      <div className="min-h-screen bg-[#FDFEFF] pb-20 transition-colors duration-300">
         <div className="max-w-5xl mx-auto px-4 pt-8">
           <div className="h-6 w-32 bg-gray-100 rounded" />
         </div>
@@ -155,17 +154,21 @@ const TalentDetail = () => {
       </div>
     );
 
-  const skillsArray = Array.isArray(talent.skils || talent.skills)
-    ? talent.skils || talent.skills
-    : [];
+  const getSkillsArray = () => {
+    const rawSkills = talent.skils || talent.skills;
+    if (Array.isArray(rawSkills)) return rawSkills;
+    try {
+      return JSON.parse(rawSkills || "[]");
+    } catch {
+      return [];
+    }
+  };
 
-  const cleanPhone = String(talent.phone || talent.phone_number || "").replace(
-    /[^\d+]/g,
-    "",
-  );
+  const skillsArray = getSkillsArray();
+  const cleanPhone = String(talent.phone || talent.phone_number || "").replace(/[^\d+]/g, "");
 
   return (
-    <div className="min-h-screen bg-[#FDFEFF] text-[#1A1C21] font-gilroy pb-20">
+    <div className="min-h-screen bg-[#FDFEFF] text-[#1A1C21] font-gilroy pb-20 transition-colors duration-300">
       <Toaster position="top-center" />
 
       {/* --- NOTIFY MODAL --- */}
@@ -188,11 +191,9 @@ const TalentDetail = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#163D5C] transition-all bg-gray-50 border-gray-200"
+                  className="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#163D5C] transition-all"
                   value={notifyForm.title}
-                  onChange={(e) =>
-                    setNotifyForm({ ...notifyForm, title: e.target.value })
-                  }
+                  onChange={(e) => setNotifyForm({ ...notifyForm, title: e.target.value })}
                   required
                 />
               </div>
@@ -215,9 +216,7 @@ const TalentDetail = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      setNotifyForm({ ...notifyForm, message: "" })
-                    }
+                    onClick={() => setNotifyForm({ ...notifyForm, message: "" })}
                     className="text-[10px] px-2 py-1 rounded-md transition-colors border bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100"
                   >
                     Clear
@@ -225,12 +224,10 @@ const TalentDetail = () => {
                 </div>
                 <textarea
                   rows="4"
-                  className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#163D5C] resize-none transition-all bg-gray-50 border-gray-200"
+                  className="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#163D5C] resize-none transition-all"
                   placeholder={`Hello! We saw your profile and it matches our ${talent.occupation} position...`}
                   value={notifyForm.message}
-                  onChange={(e) =>
-                    setNotifyForm({ ...notifyForm, message: e.target.value })
-                  }
+                  onChange={(e) => setNotifyForm({ ...notifyForm, message: e.target.value })}
                   required
                 />
               </div>
@@ -264,15 +261,13 @@ const TalentDetail = () => {
             <div className="space-y-4">
               <a
                 href={`tel:${cleanPhone}`}
-                className="flex items-center gap-4 p-4 rounded-2xl border transition-all active:scale-95 group bg-gray-50 hover:bg-gray-100 border-gray-100"
+                className="flex items-center gap-4 p-4 rounded-2xl border bg-gray-50 hover:bg-gray-100 border-gray-100 transition-all active:scale-95 group"
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-colors bg-white group-hover:bg-green-50">
                   <HiOutlinePhone className="text-xl text-blue-950" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-xs text-gray-400 font-bold uppercase">
-                    Phone
-                  </p>
+                  <p className="text-xs text-gray-400 font-bold uppercase">Phone</p>
                   <p className="text-sm font-bold truncate text-[#1D3D54]">
                     {talent.phone || talent.phone_number || "Not available"}
                   </p>
@@ -280,15 +275,13 @@ const TalentDetail = () => {
               </a>
               <a
                 href={`mailto:${talent.email || ""}`}
-                className="flex items-center gap-4 p-4 rounded-2xl border transition-all active:scale-95 group bg-gray-50 hover:bg-gray-100 border-gray-100"
+                className="flex items-center gap-4 p-4 rounded-2xl border bg-gray-50 hover:bg-gray-100 border-gray-100 transition-all active:scale-95 group"
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-colors bg-white group-hover:bg-blue-50">
                   <HiOutlineMail className="text-xl text-blue-600" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-xs text-gray-400 font-bold uppercase">
-                    Email
-                  </p>
+                  <p className="text-xs text-gray-400 font-bold uppercase">Email</p>
                   <p className="text-sm font-bold truncate text-[#1D3D54]">
                     {talent.email || "Send Email"}
                   </p>
@@ -324,11 +317,13 @@ const TalentDetail = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className={`rounded-[2rem] p-8 border ${cardBg}`}>
               <div className="flex flex-col md:flex-row gap-8 items-start">
-                <img
-                  src={talent.image || talent.profilePhoto || defaultAvatar}
-                  className="w-32 h-32 md:w-40 md:h-40 rounded-[28px] object-cover ring-8 ring-gray-50"
-                  alt="Profile"
-                />
+                <div className="relative">
+                  <img
+                    src={talent.image || talent.profilePhoto || defaultAvatar}
+                    className="w-32 h-32 md:w-40 md:h-40 rounded-[28px] object-cover ring-8 ring-gray-50"
+                    alt="Profile"
+                  />
+                </div>
                 <div className="flex-1">
                   <h1 className="text-3xl font-bold tracking-tight text-[#1A1C21]">
                     {talent.first_name} {talent.last_name}
@@ -353,18 +348,26 @@ const TalentDetail = () => {
                 <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-gray-700">
                   Skills & Expertise
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {skillsArray.length > 0 ? (
-                    skillsArray.map((skill, i) => (
-                      <span
-                        key={i}
-                        className="px-4 py-2 rounded-full text-sm font-semibold border bg-green-50 text-blue-950 border-green-100"
-                      >
-                        {typeof skill === "object"
-                          ? skill.skill || skill.name
-                          : skill}
-                      </span>
-                    ))
+                    skillsArray.map((skillObj, i) => {
+                      const name = typeof skillObj === "object" ? skillObj.skill || skillObj.name : skillObj;
+                      const years = typeof skillObj === "object" ? skillObj.experience_years : null;
+
+                      return (
+                        <span
+                          key={i}
+                          className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all flex flex-col items-start bg-green-50 text-blue-950 border-green-100"
+                        >
+                          <span>{name}</span>
+                          {years && (
+                            <span className="text-[10px] opacity-70 font-medium text-gray-500">
+                              {years}
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })
                   ) : (
                     <p className="text-gray-400 italic">No skills specified</p>
                   )}
@@ -377,8 +380,7 @@ const TalentDetail = () => {
                 About
               </h3>
               <p className="leading-relaxed text-gray-500">
-                {talent.bio ||
-                  `${talent.first_name} is a highly skilled specialist.`}
+                {talent.bio || `${talent.first_name} is a highly skilled specialist.`}
               </p>
             </div>
           </div>
@@ -386,9 +388,7 @@ const TalentDetail = () => {
           <div className="lg:col-span-1">
             <div className={`rounded-[2rem] p-8 border sticky top-8 ${cardBg}`}>
               <div className="mb-6">
-                <span className="text-sm font-medium text-gray-400">
-                  Expected Salary
-                </span>
+                <span className="text-sm font-medium text-gray-400">Expected Salary</span>
                 <div className="flex items-baseline gap-1 mt-1">
                   <span className="text-3xl font-bold text-[#101828]">
                     ${talent.minimum_salary?.toLocaleString()}
@@ -400,9 +400,7 @@ const TalentDetail = () => {
               <div className="space-y-1 mb-8">
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm text-gray-500">Employment</span>
-                  <span className="font-semibold text-sm">
-                    {talent.work_type || "Contract"}
-                  </span>
+                  <span className="font-semibold text-sm">{talent.work_type || "Contract"}</span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm text-gray-500">Rating</span>
@@ -412,22 +410,20 @@ const TalentDetail = () => {
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm text-gray-500">Location</span>
-                  <span className="font-semibold text-sm">
-                    {talent.city || "—"}
-                  </span>
+                  <span className="font-semibold text-sm">{talent.city || "—"}</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-4">
                 <button
                   onClick={() => setIsNotifyModalOpen(true)}
-                  className="w-full py-4 border-2 font-bold rounded-2xl text-sm transition-colors active:scale-95 border-[#163D5C] text-[#163D5C] hover:bg-green-50"
+                  className="w-full py-4 border-2 border-[#163D5C] text-[#163D5C] font-bold rounded-2xl text-sm transition-colors hover:bg-green-50 active:scale-95"
                 >
                   Send Alert
                 </button>
                 <button
                   onClick={() => setIsContactModalOpen(true)}
-                  className="w-full py-4 border-2 font-bold rounded-2xl text-sm transition-colors active:scale-95 border-[#1D3D54] text-[#1D3D54] hover:bg-[#1D3D54] hover:text-white"
+                  className="w-full py-4 border-2 border-[#1D3D54] text-[#1D3D54] font-bold rounded-2xl text-sm transition-colors hover:bg-[#1D3D54] hover:text-white active:scale-95"
                 >
                   Contacts
                 </button>
