@@ -12,6 +12,7 @@ import {
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { IoStatsChart } from "react-icons/io5";
 import { useTheme } from '../../context/ThemeContext';
+import { GrUserAdmin } from 'react-icons/gr';
 
 function Sidebar() {
     const navigate = useNavigate();
@@ -37,6 +38,7 @@ function Sidebar() {
 
     const navItems = [
         { name: 'Dash', path: '/dashboard', icon: <IoStatsChart size={20} /> },
+        { name: 'Admin', path: '/admin', icon: <GrUserAdmin size={22} /> },
         { name: 'Kompaniya', path: '/company', icon: <HiOutlineBuildingOffice2 size={22} /> },
         { name: 'Talent', path: '/talent', icon: <MdOutlinePersonOutline size={22} /> },
         { name: 'Ish', path: '/jobs', icon: <MdOutlineWork size={22} /> },
