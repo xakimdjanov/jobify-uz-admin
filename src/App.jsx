@@ -13,6 +13,7 @@ import Notification from "./Pages/Notificatons/Notification.jsx";
 import TalentDetail from "./Pages/Talent/TalentDetail.jsx";
 import JobDetailPageCompany from "./Pages/Job/JobDetailPage.jsx";
 import Login from "./Pages/Admin/Login";
+import AdminList from "./Pages/Admin/Admin.jsx";
 // import ProtectedRoute from "./Pages/ProtectedRoute/ProtectedRoute.jsx"; // Kerak bo'lsa ishlating
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path="/message" element={<Message />} />
           <Route path="/notification" element={<Notification />} />
           <Route path="/talent" element={<Talent />} />
+          <Route path="/admin" element={<AdminList />} />
           <Route path="/talent/:id" element={<TalentDetail />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetailPageCompany />} />
