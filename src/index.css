@@ -17,3 +17,8 @@ body,
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+::-webkit-scrollbar{
+    width: 0px;
+    height: 0;
+}
