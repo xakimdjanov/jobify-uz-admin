@@ -68,7 +68,7 @@ const TalentDetail = () => {
 
     try {
       const response = await axios.post(
-        "https://jobify-backend-production-6a97.up.railway.app/api/notifications",
+        "https://jobify-backend-production-3539.up.railway.app/api/notifications",
         payload
       );
       if (response.status === 200 || response.status === 201) {
