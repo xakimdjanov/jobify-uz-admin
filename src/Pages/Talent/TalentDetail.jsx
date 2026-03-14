@@ -384,7 +384,7 @@ const TalentDetail = () => {
                 About
               </h3>
               <p className={`leading-relaxed ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                {talent.about}
+                {talent.about || "About not yet added"}
               </p>
             </div>
           </div>
